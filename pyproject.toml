@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hand-tracking-dacn"
+version = "0.1.0"
+description = "Dynamic hand gesture recognition for touchless slide and page control"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.optional-dependencies]
+vision = [
+    "numpy>=1.26,<3",
+    "opencv-contrib-python>=4.8,<5",
+    "mediapipe>=0.10.14,<0.11",
+]
+app = [
+    "numpy>=1.26,<3",
+    "opencv-contrib-python>=4.8,<5",
+    "mediapipe>=0.10.14,<0.11",
+    "torch>=2.2,<3",
+    "pyautogui>=0.9.54,<1",
+    "pynput>=1.7,<2",
+    "scikit-learn>=1.4,<2",
+]
+
+[project.scripts]
+hand-tracking = "hand_tracking.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

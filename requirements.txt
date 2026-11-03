@@ -1,0 +1,2 @@
+# Full application dependencies; install only when starting camera/ML work.
+-e .[app]
