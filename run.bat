@@ -30,10 +30,11 @@ echo   [3] Thu du lieu pilot_01 (train, 10 clip/nhan)
 echo   [4] Thu du lieu tuy chinh (nhap session/split/count/label)
 echo   [5] Kiem tra du lieu da thu (dataset-check)
 echo   [6] Chay unit tests (unittest)
+echo   [7] Nhan dien va dieu khien bang cu chi (run)
 echo   [0] Thoat
 echo ============================================================
 set "CHOICE="
-set /p "CHOICE=Chon chuc nang (0-6): "
+set /p "CHOICE=Chon chuc nang (0-7): "
 
 if "%CHOICE%"=="1" goto DO_PREVIEW
 if "%CHOICE%"=="2" goto DO_CHECK
@@ -41,6 +42,7 @@ if "%CHOICE%"=="3" goto DO_COLLECT_PILOT
 if "%CHOICE%"=="4" goto DO_COLLECT_CUSTOM
 if "%CHOICE%"=="5" goto DO_DATASET_CHECK
 if "%CHOICE%"=="6" goto DO_TEST
+if "%CHOICE%"=="7" goto DO_RUN
 if "%CHOICE%"=="0" goto EXIT_CLEAN
 
 echo Lua chon khong hop le!
@@ -101,6 +103,13 @@ goto MENU
 :DO_TEST
 echo.
 "%PYTHON_EXE%" -m unittest discover -s tests -v
+echo.
+pause
+goto MENU
+
+:DO_RUN
+echo.
+"%PYTHON_EXE%" -m hand_tracking run
 echo.
 pause
 goto MENU
