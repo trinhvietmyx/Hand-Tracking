@@ -1,9 +1,0 @@
-﻿IPN HandS: Efficient Annotation Tool and Dataset for Skeleton-Based Hand Gesture Recognition
-
-Bai bao goc: https://www.mdpi.com/2076-3417/15/11/6321
-GitHub: https://github.com/GibranBenitez/IPN-hand
-Ngay tai: 27/10/2026
-Ma nguon: Source/
-Chua cai dat thu vien, chua chay thu nghiem. Dataset va trong so luu ngoai GitHub chua duoc tai.
-Huong dan HandS: Source/README_HandS.md. Kho IPN-hand bao gom ca tai lieu IPN Hand goc.
-Commit: 093729579be671df0cc9dd8cbc58b9a342663800

@@ -1,8 +1,0 @@
-Những yêu cầu cần có trong Slide Báo Cáo Tiến Độ DACN:
-1. Trích dữ liệu thật của công trình nghiên cứu liên quan đến đề tài và chỉ ra được nguồn và bài báo gốc
-2. Luồng và xử lý và dữ lieu thật của đồ án hiện tại 
-
-Thấy tôi nói: có các công trình nào họ nghiên cứu trước cái này không mình trình bày cái đó chỉ rõ bài báo nào ở đâu 
-đọc hiểu bài báo tìm hiểu bài báo xong coi code chạy như nào hiểu code xong mới rộng thêm ra
-
-dung mô hình gì, kiến trúc của mô hình như thế nào tại sao dung kiến trúc môi hình đó đọc vô hình của họ hiểu sâu vào mô hình tại sao họ dung cái đó nó có ưu nhược điểm gì thì lúc đó mới nghĩ đến câu chuyện là mình có làm gì được hay không kiến trúc sử dung các công cụ gì đi sâu giải thích được tại sao người ta dung cái này bài báo có đóng góp gì  	  

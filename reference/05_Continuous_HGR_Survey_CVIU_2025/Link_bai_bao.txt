@@ -1,9 +1,0 @@
-﻿Continuous hand gesture recognition: Benchmarks and methods
-
-Bai bao goc: https://www.sciencedirect.com/science/article/pii/S1077314225001584
-GitHub: Chua xac minh duoc kho chinh thuc
-Ngay tai: 27/10/2026
-
-PDF: 05_Continuous_Hand_Gesture_Recognition_Benchmarks_and_Methods_CVIU_2025.pdf
-Nguon PDF: https://www.cs.ucf.edu/~jjl/pubs/marcoCVIU2025.pdf
-Ngay tai PDF: 31/10/2026

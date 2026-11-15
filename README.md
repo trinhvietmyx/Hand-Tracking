@@ -2,7 +2,7 @@
 
 Đồ án một sinh viên: nhận diện bốn cử chỉ vuốt để chuyển slide và cuộn trang.
 
-Bộ khung bám theo [đặc tả 1.1](reports/01_tai_lieu_de_tai/DAC_TA_NHAN_DIEN_CU_CHI_TAY_DONG_VA_DIEU_KHIEN_MAY_TINH_KHONG_CHAM.md).
+Bộ khung bám theo đặc tả 1.1 của đồ án; bản đặc tả được lưu cục bộ trong thư mục reports.
 
 ## Trạng thái hiện tại
 
@@ -10,7 +10,7 @@ Bộ khung bám theo [đặc tả 1.1](reports/01_tai_lieu_de_tai/DAC_TA_NHAN_DI
 
 Đã có **collect** để thu clip có nhãn, **dataset-check** để kiểm tra dữ liệu, **train** để huấn luyện LSTM và **evaluate** để đánh giá các clip test. Lệnh **run** nhận diện qua webcam và gửi lệnh sau khi cử chỉ vượt qua GestureGate. Điều khiển bắt đầu ở OFF; F8 bật/tạm dừng, F9 thoát.
 
-[Notebook](notebook/hand_tracking.ipynb) trình bày sáu công trình tham khảo, đọc bài IPN HandS, luồng code và thực nghiệm trên dữ liệu tự thu. [Lời trình bày](notebook/speaker_notes.md) dùng cho buổi báo cáo với giảng viên hướng dẫn. Tài liệu báo cáo nằm trong [reports](reports/); mã nguồn tham khảo và cách tải nằm trong [reference](reference/README.md).
+[Notebook](notebook/hand_tracking.ipynb) trình bày sáu công trình tham khảo, đọc bài IPN HandS, luồng code và thực nghiệm trên dữ liệu tự thu. [Lời trình bày](notebook/speaker_notes.md) dùng cho buổi báo cáo với giảng viên hướng dẫn. Hai thư mục `reference/` và `reports/` chỉ lưu trên máy và được loại khỏi Git.
 
 ## Cấu trúc
 
@@ -39,8 +39,8 @@ Hand-Tracking/
 ├── models/                    # Checkpoint LSTM
 ├── outputs/                   # Log và kết quả đánh giá
 ├── notebook/                  # Nghiên cứu, thực nghiệm và lời trình bày
-├── reference/                 # Bài báo và submodule mã nguồn tác giả
-├── reports/                   # Báo cáo tiến độ và minh chứng
+├── reference/                 # Tài liệu/mã nguồn tham khảo, chỉ lưu cục bộ
+├── reports/                   # Báo cáo tiến độ/minh chứng, chỉ lưu cục bộ
 ├── tests/                     # Cấu hình, I/O, đặc trưng, sampling, preview
 ├── docs/ROADMAP.md             # Thứ tự code tiếp
 ├── pyproject.toml             # Python package và nhóm phụ thuộc
@@ -165,7 +165,7 @@ Hoặc mở `run.bat` và chọn **7**. F8 bật/tạm dừng, F9 thoát; Q/Esc/
 
 Chọn kernel thuộc môi trường `.venv` và chạy các ô từ trên xuống. Notebook dùng checkpoint riêng tại `models/notebook/gesture_lstm.pt` và kết quả tại `outputs/notebook/`. Các tệp này cùng dữ liệu tự thu cần được tạo hoặc cung cấp lại trên máy mới.
 
-Để đọc code tham khảo, tải các submodule theo [hướng dẫn reference](reference/README.md). Bản thực nghiệm đồ án chưa tái lập benchmark LSTM gốc của IPN HandS.
+Các ô notebook đọc PDF hoặc mã nguồn tham khảo cần thư mục `reference/` có sẵn trên máy. Thư mục này được giữ cục bộ; clone từ GitHub không kèm bài báo và repo tham khảo. Bản thực nghiệm đồ án chưa tái lập benchmark LSTM gốc của IPN HandS.
 
 ## Các lệnh CLI
 
@@ -189,7 +189,7 @@ Các lệnh `check`, `preview`, `collect`, `dataset-check`, `dataset-remove`, `d
 - Một LSTM, một tầng, 64 chiều trạng thái ẩn, năm đầu ra. Checkpoint tạo bởi lệnh train và không đưa vào Git.
 - Điều khiển khởi động ở trạng thái tắt. F8 bật/tạm dừng và xóa chuỗi đang chờ; F9 thoát toàn cục khi chạy nhận diện có cửa sổ.
 - Dữ liệu ba phiên riêng: train/validation/test. Chi tiết ở data/README.md.
-- Dữ liệu thu gốc, đặc trưng, trọng số, log, .venv và video báo cáo đầy đủ không đưa vào Git. Các minh chứng ngắn được chọn trong reports có thể đi cùng báo cáo.
+- Dữ liệu thu gốc, đặc trưng, trọng số, log, .venv cùng toàn bộ hai thư mục reference và reports không đưa vào Git.
 
 ## Kiểm tra
 

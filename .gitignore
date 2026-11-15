@@ -31,7 +31,10 @@ outputs/**
 !outputs/README.md
 !outputs/.gitkeep
 
-# Local slide dependencies, review renders and full-length report recordings.
+# Local dependencies.
 node_modules/
-reports/**/slide_sources/qa/
-reports/05_video/*.mp4
+
+# Research references, progress reports and their submodule metadata stay local.
+/reference/
+/reports/
+/.gitmodules
