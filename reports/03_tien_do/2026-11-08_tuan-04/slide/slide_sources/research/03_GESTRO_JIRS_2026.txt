@@ -1,0 +1,1050 @@
+--- PAGE 1 ---
+Journal of Intelligent & Robotic Systems (2026) 112:51
+https://doi.org/10.1007/s10846-026-02395-9
+REGULAR PAPER
+GESTRO: Skeleton-Based Dynamic Gesture Recognition
+for Robot Teleoperation
+Thorsten Hempel 1 · Magnus Jung 1 · Arman Ahmed Khan 1 · Ayoub Al-Hamadi 1
+Received: 20 December 2024 / Accepted: 30 March 2026 / Published online: 16 April 2026
+© The Author(s) 2026
+Abstract
+Lately, improving the efﬁciency of human-robot interaction (HRI) has gained signiﬁcant importance, particularly in industrial
+settings, where the robot’s ability to understand and act on human gestures has become essential for a smooth collaboration.
+This paper contributes to the challenge of real-time gesture recognition for mobile robot teleoperation. It introduces a new
+tailored dataset GESTRO with 11 dynamic gestures captured in 3,300 samples in total dedicated for intuitively controlling
+mobile autonomous systems. Based on the proposed dataset, this paper introduces a LSTM (long short-term memory) model
+with attention mechanism, achieving an accuracy of 0.98. An extensive evaluation examines the data quality and the importance
+of dynamic sequence for accurate gesture detection. Finally, the proposed model is implemented on a mobile robotics system,
+demonstrating its usability in realistic human-robot interaction setting. The proposed dataset along with the presented models
+are made publicly available ( https://github.com/thohemp/gestro).
+Keywords Gesture recognition · Human robot interaction · Keypoint detection · Dynamic gestures · Robot teleoperation
+1 Introduction
+Human-robot interaction has emerged as a key area of
+robotics research, dedicated to facilitating seamless and
+intuitive exchanges between robots and human operators.
+This includes establishing intuitive communication chan-
+nels [ 43], especially non-contact ones [ 42, 43]a sw e l la s
+capturing important social cues [ 15] and signals [ 2]. The
+ability to interpret and respond to human gestures enables
+robots to understand and adapt to human behavior, thereby
+facilitating seamless collaboration and interaction in vari-
+ous domains, ranging from industrial [ 36, 47] and medical
+automation [12] to healthcare assistance [ 19, 46], domestic
+robotics [39, 41] and service applications [ 16, 30]. Gesture
+recognition can serve as a critical component in bridging the
+gap between human commands and robotic actions [ 35, 38].
+However, this is challenging due to the complex and dynamic
+environmental conditions in which human-robot interac-
+tions typically occur. V arying lighting, background clutter,
+occlusions, and user-speciﬁc variations impose signiﬁcant
+demands on recognition systems [ 10, 49]. By decoding the
+intricate language of gestures, robots can discern human
+intentions, enabling them to perform tasks effectively and
+B Thorsten Hempel
+thorsten.hempel@ovgu.de
+1 Neuro-Information Technology Group,
+Otto-von-Guericke-University, Magdeburg, Germany
+cohesively within human-centered environments [ 23]. This
+capability streamlines task execution and enhances the user
+experience by providing a natural and intuitive means of com-
+munication [44].
+This work addresses thechallenge of vision-based dynamic
+gesture recognition for mobile r obots. It introduces a novel
+dataset of eleven dynamic hand gestures and a real-time
+recognition model specifically designed for limited hardware-
+capacity mobile robotics.
+Our contributions are summarized as follows:
+– The release of a novel dynamic hand gesture dataset
+containing 3,300 dynamic samples, each consisting of
+a 30-frame dynamic gesture.
+– An accurate LSTM model based on upper body land-
+marks for real-time gesture recognition.
+– An extensive evaluation of the proposed dataset and
+models, including an examination of the importance of
+dynamic gestures for robust classiﬁcation.
+– The implementation and initial testing on a real humanoid
+robot platform.
+The remainder of this paper is structured as follows. First,
+related datasets for gesture recognition are discussed and ana-
+lyzed according to its size, type of gestures and purpose.
+Further, recent gesture recognition models from the related
+works are discussed in terms of its advantages and disadvan-
+123
+
+--- PAGE 2 ---
+51 Page 2 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+tages. Next, a new dataset with dynamic gestures for robot
+teleoperation is proposed, along with details of its data cura-
+tion and processing. In the following, an LSTM with attention
+mechanism is introduced for gesture prediction and is evalu-
+ated in the experiment section. Lastly, implementation details
+are give to implement the LSTM model on a mobile robot
+platform.
+2 Related Work
+The task of dynamic gesture recognition, as opposed to
+static gesture recognition, involves analyzing poses over
+time, capturing the motion and transitions between different
+states. This distinction is crucial as it introduces a temporal
+dimension to gesture recognition, adding complexity but also
+enhancing the system’s ability to interpret more nuanced and
+natural human commands.
+2.1 Gesture Datasets
+Over the recent years, numerous gesture datasets have been
+proposed and made publicly available. These datasets dif-
+fer in the type of gesture, whether static or dynamic, their
+purpose and the selected gesture classes, as well as in size
+in terms of the number of samples and classes. Table 1 pro-
+vides an overview of recent popular datasets, including a
+description of their key attributes. The largest dataset was
+presented by Materzynsk et al. [ 27], called Jester, including
+148,092 samples, distributed across 27 classes. The samples
+were collected from 1,300 actors from close range in front of
+a notebook camera using static hand gestures. The selected
+classes may serve as general-purpose gestures; however, the
+dataset’s capturing setup and static gestures make it unsuit-
+able for robot interaction purposes. Similarly, the datasets
+presented in [ 13, 24, 48, 52] provide large amounts of data,
+but with gestures that are not intuitively used in human-robot
+interactions.
+In their study, Laplaza et al. [ 22] presented a data set
+designed to control a social mobile robot. They provide static
+and dynamic gestures that are employed for fundamental
+teleoperation commands (e.g.turn left, turn right) and, more-
+over, for communication purposes (e.g.,approve and conﬁrm
+understanding). However, the dataset is limited in size, com-
+prising only 450 samples, and is therefore not suitable for
+learning-based recognition methods.
+This paper bridged this gap by introducing a new dataset
+with eleven universally dynamic gestures targeting the con-
+trol of mobile robots for elementary teleoperation. It consists
+of 3,300 samples equally balanced across all classes, provid-
+ing double the amount of data compared to similar datasets,
+such as those referenced in [ 21] and [ 45]. Along this paper
+it will be demonstrated that this data is sufﬁcient in order to
+be used in trainable gesture recognition approaches.
+2.2 Gesture Recognition
+In the recent literature, a common approach for gesture recog-
+nition is CNNs (Convolutional Neural Networks) to extract
+the meaningful features from the image data for classiﬁca-
+tion [ 17, 20, 34, 51]. Most of these are constructed to only
+process a single frame, thus, limited to solely static gesture
+detection. Laplaza et al. [ 22] proposed a landmark-based
+approach using MediaPipe [ 25] to predict 33 body land-
+marks along with their estimated depth positions based on
+RGB images. Despite providing sequences for the dynamic
+gestures in their dataset, their classiﬁcation model only takes
+the last frame of each sample into account. Therefore, only
+static gestures are recognized and classiﬁed by a four fully
+connected layer network.
+Table 1 Overview of published gesture datasets including its gesture type, the number of classes and samples, the number of involved subjects, the
+data modality and the gesture purpose. (*Static/Dynamic)
+Dataset Gesture type S/D* Classes Samples Subjects Purpose
+The IPN Hand [ 8] Hand S + D 13 4,218 50 Screen Control
+ASL [13] Hand S 24 60,000 5 Sign Language
+NTU RGB+D 120 [ 24] Body D 120 114,480 106 Action Recognition
+Jester [27] Hand S 27 148,092 1,300 General Purpose
+NVGesture [29] Hand D 25 1,532 20 Touchless Driver Control
+UA V -GESTURE [33] Arms S 13 119 11 UA V Control
+IMHG [40] Hand S 8 704 22 Pointing Gestures
+Tan et al. [45] Arms + Hands D 25 7,500 190 General Purpose
+Wan et al. [48] Arms + Hands D 249 47,933 21 General Purpose
+EgoGesture [52] Hand S + D 83 24,161 50 Wearable Device Control
+Kollakido et al. [ 21] Body S + D 20 3,400 17 Robot Teleoperation
+Laplaza et al. [ 22] Arms + Hands S + D 15 450 10 Robot Teleoperation
+GESTRO Arms + Hands D 11 3,300 10 Robot Teleoperation
+123
+
+--- PAGE 3 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 3 of 14 51
+Table 2 A summary of the eleven potential gesture commands and the
+anticipated robot responses
+Gesture command Description
+Follow The robot follows its assigned person.
+Go to Base The robot navigates to a predeﬁned home
+position.
+Idle The robot waits for further commands.
+Login The robot is assigned to a speciﬁc person
+to accept commands.
+Logout The robot is released from the assigned per-
+son.
+Move Backward The robot navigates backwards.
+Move Forward The robot navigates forwards.
+Stop The robot stops.
+Turn Left The robot rotates to the left.
+Turn Right The robot rotates to the right.
+Unknown The gesture could not be recognized.
+To detect dynamic gestures and facilitate the temporal
+dimension, other methods [ 3, 28, 45] use 3D-CNNs that are
+capable of processing a series of frames. Depending on the
+number of frames, this approach is computational expen-
+sive and can impair real-time detection on mobile systems.
+In the search for more efﬁcient encoding approaches, land-
+mark extraction strategies became a popular choice [ 1, 7,
+26]. Ansar and Ahmad [ 5] detect hand key points that are
+fed into an RNN (Recurrent Neural Network) for spatial per-
+ception of dynamic gestures. Similarly, Samaan et al. [ 37]
+additionally track head and body pose to capture sign ges-
+tures from dynamic sequences based on an RNN. To improve
+generalization, Zeghoud et al.[ 50] used hand landmarks and
+proposed an additional spatial normalization layer that can be
+equipped on various model types. They tested their method
+on RNN, LSTM and GRU (Gated Recurrent Unit) architec-
+tures.
+In the following, a new approach adapting the idea of land-
+mark encoding in combination with Bidirectional LSTM is
+proposed to detect and classify dynamic gestures on mobile
+platforms. The proposed LSTM is equipped with an addi-
+tional attention layer, that allows capturing different spacial
+relationships between the joints simultaneously, allowing
+to generate a more profound understanding of the pose
+changes while performing the gestures. At the same time,
+the computational effort remains limited, leading to real-time
+processing capabilities on mobile robotic platforms.
+3 Dataset
+Due to the lack of suitable dynamic gesture datasets tailored
+for intuitive commanding of mobile robots, a new dataset for
+teleoperating mobile platforms is introduced. In the process
+of selecting the commands and their corresponding gestures,
+ten fundamental and universally applicable classes are iden-
+tiﬁed that are essential for teleoperating mobile robots. In
+addition to these ten classes, another class for unknown ges-
+tures is added that serves as a rest class. It allows the handling
+of non-gestures or gestures that are not targeted towards the
+robot and, therefore, reduces false positive classiﬁcations.
+The selected commands are displayed in Table 2.T h e y
+include basic teleoperation commands such as Move F or-
+ward, Move Backward, Move Left, Move Right, Stop and
+security commands such asLogin, Logout to restrict access to
+the gesture recognition system to system administrators only.
+Additionally, more complex, but fundamental commands
+with F ollowand Go to Base complete the selection. For each
+command, intuitive and easily distinguishable gestures were
+chosen as shown in Fig. 1.
+Fig. 1 Compilation of the ten commands with their primary gestural representations in the main form. Each gesture has been designed intending
+to facilitate intuitive interaction, thereby enabling seamless communication between the user and the robot
+123
+
+--- PAGE 4 ---
+51 Page 4 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+3.1 Data Acquisition
+For data collection, a diverse group of ten participants was
+selected, varying in race, age, gender, stature and background
+(see Fig. 2). Each participant performed each of the ten ges-
+tures 30 times and was recorded by a laptop camera with an
+image resolution of 800 × 600 pixels. Every atomic gesture
+is encapsulated in 30 frames, which, based on the camera’s
+frame rate, equals to 1.5 seconds. Each of these recordings
+serves as single samples. The records for the unknown class
+were captured based on random videos from Y ouTube with
+persons recorded in a similar setup. There are 300 samples
+for every class, resulting in a dataset of 3,300 samples in
+total.
+3.2 Data Preprocessing
+The dataset preprocessing involves the extraction of human
+pose landmarks (Fig. 3). To this end, a robust pose esti-
+mator is selected that is trained on the COCO-WholeBody
+dataset [ 18] and consists of a ResNet152 backbone and a
+heatmap prediction head. It simultaneously estimates 133
+2d-landmarks for the entire body, including three landmarks
+for each foot, 21 landmarks for each hand, 59 face landmarks
+and 17 body landmarks. From this set of keypoints those from
+the upper body are selected, including face, arms and hands,
+resulting in a subset of 54 landmarks, as shown in Fig. 4.
+The remaining 79 landmarks are omitted since they are not
+involved during the execution of the chosen gestures.
+First, selected keypoints are normalized in relation to
+the frame’s size, resulting in 2D landmarks positions with
+x, y ∈
+[
+0, 1
+]
+. Next, the keypoint positions are standardized
+by transforming the landmarks in reference to the nose key-
+point. This ensures that the detected landmarks are agnostic
+towards the human’s position on the image plane. Since after
+this step the nose keypoint becomes (0, 0), it is also omitted
+and not incorporated into the dataset.
+Figure 3 illustrates the distribution density of the pro-
+cessed landmarks separated for each class. To highlight the
+dynamic joints, the landmarks from the head and upper
+Fig. 2 Sample images of different participants from the datasets, showing the diversity of participants
+123
+
+--- PAGE 5 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 5 of 14 51
+Fig. 3 Visualization of the distribution density of arm and ﬁnger joints
+across subjects and frames for the different gestures in the proposed
+dataset. The position distribution of some gestures shows remarkable
+similarities, suggesting that temporal dynamics are crucial for the recog-
+nition and discrimination of these gestures
+body are not included for this visualization. Instead, only
+landmarks from the arms and hands are used. As a result,
+a gesture-wise impression of the landmarks’ motions is cre-
+ated and merged into a single image. The illustration for the
+Turn Left and Turn Right reﬂects the movement of raising
+the arms and directing them to one of the sides. Login Admin
+Fig. 4 Example image illustrating the detected landmarks and their
+positions on the subject
+and Logout Admin show a similar pattern of a mirrored move-
+ment. This is caused as the Login Admin gesture is always
+performed with the left hand, and the Logout Admin gesture
+with the right hand.
+On the other side, based on the distribution density, the
+F ollow and Stop gesture is way harder to distinguish. As
+these are completely opposite commands, the model has to
+extract sufﬁcient information from the motion over the time
+to derive robust classiﬁcation between these two classes.
+4 Method
+This work proposes a model based on two layers of Bidirec-
+tional Long Short-Term Memory (BiLSTM) units, comple-
+mented by an attention mechanism, to recognize and classify
+dynamic gestures based on extracted 2D body landmarks.
+Table 3 Network architecture. An LSTM with two bi-directional
+LSTM layers followed by an attention layer
+# Layer Input Hidden
+1 Bi-Directional LSTM 161 512
+2 Normalization
+3 Dropout ( p = 0.5)
+4 Bi-Directional LSTM 1024 512
+5 Normalization
+6 Dropout ( p = 0.5)
+7 Attention ( h = 8) 1024 512
+8 Fully Connected Dense 1024 11
+9S o f t m a x
+123
+
+--- PAGE 6 ---
+51 Page 6 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+Each input sequence I consists of T = 30 frames, where
+each frame Ft contains 2D coordinates of 54 body landmarks
+(xti , yti ) (D = 108 feature dimensions), extracted using a top-
+down heatmap-based ResNet152 [ 9]. The sequence is thus
+represented as
+It =
+{
+(xti , yti )}54i=1 , K ∈ RT×D (1)
+The sequential input is processed by two stacked layers
+of bidirectional LSTM units. Each LSTM cell follows the
+standard formulation with forget, input, and output gates that
+update the hidden state ht and the cell state Ct [4]. For each
+time step t, the hidden states from the forward and backward
+passes are concatenated as follows:
+Ht =
+[−→ht ;←−ht ] (2)
+To allow the model to focus on the most informative time
+steps, an attention mechanism is applied to compute a context
+vector c as a weighted sum of the hidden states [ 6]:
+c =
+T∑
+t=1
+αt ht (3)
+where the attention weights αt are learned and normalized.
+The context vector c is passed through a fully connected
+dense layer with softmax activation to obtain the class prob-
+ability distribution z [14]:
+z = softmax(Wc · c + bc), z ∈ R11 (4)
+where Wc is the weight matrix and bc is the bias vector of
+the output layer.
+The model is trained using the categorical cross-entropy
+loss [14], which quantiﬁes the discrepancy between the pre-
+dicted class distribution z and the ground truth label g.F o ra
+given input sample, the loss is computed as follows:
+LCE =−
+11∑
+k=1
+yk log(zk) (5)
+In this context, gk denotes the ground truth label. Con-
+currently, zk signiﬁes the predicted probability for class k
+derived from the softmax output.
+The bidirectional structure allows the model to capture
+both past and future context, while the attention mecha-
+nism enhances temporal focus, improving both accuracy and
+robustness. The detailed architectural speciﬁcations of the
+model are listed in Table 3.
+The entire pipeline can be described as follows: The sys-
+tem collects the frame from the camera and predicts the 2D
+coordinates of the body landmarks. The landmarks are pro-
+cessed by the LSTM model to estimate the probability of the
+learned gestures. The entire process is illustrated in Fig. 5.
+In order to enhance the model’s resilience to variations
+and noise present in motion data, targeted data augmentation
+strategies were implemented during the training and evalu-
+ation phases. Each input sequence I in the set RT×D was
+modiﬁed using two complementary techniques.
+First, to simulate incomplete or noisy gesture executions,
+a temporal masking operation was performed. A segment
+of the input sequence was selected at random through the
+implementation of a sampling method. This method entailed
+the extraction of a cut length c from the interval of [0, 25)
+and the determination of a center position p from the interval
+of [0, 30). This was then zeroed out, effectively replacing the
+associated frames with null vectors:
+It = 0, ∀ t ∈
+[
+max
+(
+0, p −
+[ c
+2
+])
+, min
+(
+30, p +
+[ c
+2
+])]
+(6)
+Secondly, in order to account for variation in subject scale
+and distance to the camera, a global scaling factor s, ranging
+from 0.3t o1.3, was sampled uniformly and applied element-
+Fig. 5 Overview of the proposed gesture recognition pipeline. The
+process begins with 30 RGB frames as input, followed by a key-
+point extraction of 54 body landmarks. The keypoints are normalized,
+standardized, and ﬁnally fed into bi-directional LSTM model with
+attention-mechanism for dynamic gesture classiﬁcation
+123
+
+--- PAGE 7 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 7 of 14 51
+wise to all features in the sequence:
+I = s · I (7)
+During the evaluation, the same masking and scaling oper-
+ations were retained to allow for performance assessment
+under realistic, potentially noisy conditions.
+5 Experiments
+This section describes the training and experiments of the
+proposed model GESTRO-LSTM on our proposed GESTRO
+dataset. It starts with a description of the experimental
+setup, followed by an introduction to the evaluation metrics.
+Multiple experiments are conducted including the compar-
+ison of the proposed model architecture with other similar
+architectures, class-wise performance evaluations and further
+analysis of regarding the impact of the sequence length on
+the classiﬁcation results. The section closes with the imple-
+mentation and initial test of the proposed model on a real
+humanoid robot.
+5.1 Experimental Setup
+The dataset was divided into a training set (80%, subject 1-8)
+and a test set (20%, subject 9-10) for the purpose of model
+training. The division was made with respect to the subjects,
+using the data of eight subjects for training and the data of
+the remaining two subjects for testing. This way, the model
+cannot learn the individual joint placements of the test sub-
+jects, that could occur in a randomly mixed split. The model
+Fig. 6 Loss and accuracy curves over the training epochs of our pro-
+posed GESTRO-LSTM model on the GESTRO dataset
+was trained for 30 epochs using the Adam optimizer [11] and
+a learning rate of 0.0001. Figure 6 illustrates the trends in the
+loss and accuracy curves for the training and test sets over the
+epochs. It demonstrates that the model can learn quickly and
+starts to converge at epoch seven. The jumps in the test loss
+and test accuracy curves are caused by the relatively small
+number of test samples.
+5.2 Evaluation Metrics
+The evaluation of the GESTRO-LSTM model on our pro-
+posed GESTRO dataset was performed using multiple per-
+formance metrics including accuracy, precision, recall, and
+F1 score. These metrics provide complementary insights:
+Accuracy provides an overall measure of correctness, pre-
+cision evaluates the model’s ability to avoid false positives,
+recall highlights its ability to identify true positives, and the
+F1 score balances these two aspects. The analysis was per-
+formed over individual training epochs to observe learning
+trends and to detect overﬁtting. A comparative evaluation
+against different methods was also performed to highlight
+their respective strengths and weaknesses. In addition, inter-
+class comparisons were performed to assess class sensitivity
+and class-wise robustness, ensuring a detailed understanding
+of the model’s behavior across different categories.
+5.3 Model Comparison
+In Table 4, the proposed model is compared against sev-
+eral popular architectures. To ensure a fair evaluation, all
+models from the ﬁrst block share the same structural tem-
+plate described in Table 3, consisting of two blocks using
+either a GRU, LSTM, or RNN cell, followed by normal-
+ization and dropout with p = 0.5. The transformer model
+employs an encoder with two layers, each using 8 attention
+heads. Additionally, we evaluated ResNet50 and ResNet18
+CNN architectures, where all keypoints are transformed into
+Table 4 Comparison of our proposed GESTRO-LSTM with other
+architectures
+Model Acc. Recall Precision F1
+GRU 0.85 0.85 0.89 0.85
+Bi-GRU 0.88 0.88 0.91 0.88
+RNN 0.84 0.85 0.87 0.85
+Bi-RNN 0.84 0.85 0.88 0.86
+LSTM 0.93 0.94 0.93 0.94
+Bi-LSTM 0.95 0.96 0.96 0.96
+Transformer 0.96 0.96 0.97 0.96
+ResNet50 0.91 0.91 0.91 0.91
+ResNet18 0.89 0.89 0.91 0.90
+GESTRO (our) 0.98 0.98 0.98 0.98
+Bold number indicate best result for each column
+123
+
+--- PAGE 8 ---
+51 Page 8 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+a 2D image before processing. All models are trained on the
+processed landmark dataset introduced in Section 3,u s i n g
+the same training setup outlined in Section 5.1.
+Overall, our proposed GESTRO-LSTM model achieves
+98% across all performance metrics, outperforming the other
+architectures in the comparison. The second-best results, in
+terms of F1 score, are obtained by the Bi-LSTM and Trans-
+former models, both reaching 96%. Notably, the Bi-LSTM
+shares the same architecture as GESTRO-LSTM, except for
+the absence of the attention layer. This suggests that incor-
+porating the attention mechanism improves F1 score by 2%
+and accuracy by 3%. The Transformer shows similar per-
+formance improvements. During training, the Transformer
+exhibited a ﬂatter learning curve compared to the LSTM-
+based models, which we attribute to the limited size of the
+training dataset–an environment where Transformers typi-
+cally underperform due to their reliance on large data corpora.
+Both models are further analyzed in Section 5.6. The CNN-
+based architectures (ResNet18 and ResNet50) fall behind,
+with all metrics around 0.9. Since ResNet50, despite its
+signiﬁcantly larger parameter count, performs similarly to
+ResNet18, we conclude that CNN-based approaches are gen-
+erally not competitive compared to the proposed LSTM with
+attention.
+In general, the overall high accuracy results show a good
+learning behavior of the trained models indicating the quality
+of the proposed dataset, as well as distinguishability of the
+selected gestures.
+5.4 Classwise Comparison
+To evaluate if this refers to all gestures, another experiment is
+conducted, depicted in Table 5, that lists the precision, recall
+and F1 scores for all classes individually. The results show a
+Table 5 Precision, recall and F1 score results on the test data for the
+ten described gestures and unknown movements
+Class Precision Recall F1-Score
+Follow 1.00 1.00 1.00
+Go to Base 1.00 1.00 1.00
+Idle 0.85 1.00 0.92
+Login 0.98 0.97 0.97
+Logout 0.98 1.00 0.99
+Move Backward 1.00 0.98 0.99
+Move Forward 1.00 0.90 0.95
+Stop 1.00 0.98 0.99
+Turn Left 0.98 0.97 0.97
+Turn Right 1.00 1.00 1.00
+Unknown 1.00 0.97 0.98
+Table 6 One vs All test: One subject is chosen as test split, while the
+other subject’s data is used for training
+Testset Accuracy Precision Recall F1-Score
+S1 0.98 0.97 0.98 0.98
+S2 0.97 0.98 0.98 0.98
+S3 0.97 0.98 0.98 0.98
+S4 0.97 0.96 0.96 0.96
+S5 0.98 0.98 0.98 0.98
+S6 0.96 0.98 0.98 0.98
+S7 0.97 0.97 0.96 0.96
+S8 0.98 0.99 0.99 0.99
+S9 0.96 0.98 0.98 0.98
+S10 0.96 0.98 0.98 0.98
+Avg 0.97 0.98 0.98 0.98
+strong performance over all metrics and classes up to 100%.
+With 85% precision, the Idle class is standing out. Since this
+class contains no gesture movements, it likely to be confused
+with other gesture that couldn’t be attributed accordingly.
+5.5 One-vs-All
+In the prior experiments, the ﬁrst eight subjects’ data was
+used for training, while the remaining data was used for test-
+ing. To conﬁrm that the observed data quality applies to the
+entire datasets, a one-vs-all test is performed. For this, the
+data of one subject is used as a test set, while the data for the
+other nine subjects is used for training. The results in Table 6
+show that the strong performance is effectively maintained
+throughout the variation between individuals. This also indi-
+cates that our proposed model can adapt to different subjects
+without being biased by unique features that could signiﬁ-
+cantly degrade classiﬁcation performance. This suggests that
+the model has identiﬁed relevant features and patterns that
+remain stable across subjects. As a result, the model is well-
+equipped to perform reliably on unseen data, making it highly
+robust and suitable for real-world applications where new,
+unknown subjects are encountered.
+For additional evaluation, the confusion matrix is illus-
+trated in Fig. 7. It reﬂects the results shown in Table 5,
+demonstrating generally very robust prediction performance
+among the different classes. Move F orwardwas falsely clas-
+siﬁed for 6 time, while it was 5 times predicted as Idle.T h i s
+aligns with the observations of the relatively low precision
+for the Idle class (Fig. 8).
+5.6 Sequence Length Analysis
+To further compare the two best models (GESTRO-LSTM
+and Transformer) on our GESTRO dataset, the inﬂuence of
+123
+
+--- PAGE 9 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 9 of 14 51
+Fig. 7 The confusion matrix for
+the test dataset demonstrates
+that our LSTM model is highly
+sensitive to different gestures,
+showing robust prediction and
+discrimination abilities
+the sequence length on the precision is investigated (see
+Fig. 9). This indicates that the models do indeed depend
+on the dynamics in the sequences to correctly estimate the
+gestures. The static view of the gestures is therefore not suf-
+ﬁcient, and the dynamic view increases the reliability of the
+gesture estimation at an early stage. When comparing the
+models, it can be observed that the GESTRO-LSTM model
+learns well to discriminate between gesture classes even with
+really short sequences. The Transformer model, on the other
+hand, requires signiﬁcantly longer sequences and performs
+even worse. In particular, the classesIdle and F olloware more
+difﬁcult for both models to discriminate. However, the Trans-
+former model also requires signiﬁcantly longer sequences to
+discriminate the Move Backward class.
+Looking at the robustness through the variation of the
+F1 error over different sequence lengths also shows that
+the range of F1 values of the LSTM is narrower and more
+continuous, making the LSTM model more robust than the
+transformer model (see Fig. 10).
+Overall, this proves that the GESTRO-LSTM can differ-
+entiate earlier and more robustly than the transformer model.
+This could be due to the relatively small size of the data set
+relative to its complexity for a transformer, as well as the fact
+that the LSTM is strengthened by its bi-directionality in both
+its short-term and long-term memory, and prioritizes the rel-
+evant spatial and temporal information through its attention
+unit.
+Fig. 8 Performance of the proposed GESTRO-LSTM model on the different classes of the presented dataset as a function of the sequence length
+123
+
+--- PAGE 10 ---
+51 Page 10 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+Fig. 9 Performance (F1-score, precision and recall) of the Transformer model on the different classes of the presented GESTRO dataset as a
+function of the sequence length
+Fig. 10 Comparison of the F1
+score over the sequence length
+between the proposed LSTM
+model and the transformer
+model
+Fig. 11 Experimental scenarios on the humanoid robot TIAGo from
+PAL Robotics [31]. In b)a n dc) the view from the robot’s camera with
+keypoint detection and real-time gesture recognition feedback is shown.
+The classiﬁcation is labeled on the top of the image. The class proba-
+bilities are listed on the left side as coloured bars
+123
+
+--- PAGE 11 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 11 of 14 51
+6 Robot Implementation
+To assess the efﬁcacy of the proposed methodology in a
+real-world setting, the GESTRO-LSTM and the Transformer
+model were deployed on the humanoid robot TIAGo, man-
+ufactured by PAL Robotics [ 32]( s e eF i g .11). In this setup,
+frames were processed without a queue, i.e. frames arriv-
+ing faster than the system could process were skipped. This
+approach ensured the real-time capability of the system,
+but also increased the difﬁculty of processing the tempo-
+ral dynamics of gestures, which signiﬁcantly challenged the
+robustness of the models. Under these real-world conditions,
+the Transformer exhibited greater robustness problems than
+expected based on its dataset performance. In contrast, the
+GESTRO-LSTM showed strong robustness in gesture recog-
+nition. The transition between gestures usually required a
+short period of time to build up the necessary probability
+threshold. However, the safety-critical stop gesture was rec-
+ognized immediately, highlighting its distinction from other
+gestures. In addition, the unknown gesture effectively cap-
+tured outliers, whether they were gestures foreign to the
+dataset or arbitrary movements, demonstrating its strong gen-
+eralization ability.
+The latency evaluation on the real robot’s Jetson AGX Orin
+revealed an FPS throughput of 29.94 for published images,
+while the pose estimation node operated at 6.972 Hz and the
+gesture recognition node at 4.81 Hz. The initial detection
+latency of 5.528 s for the ﬁrst gesture can be attributed to
+the LSTM model, which requires 30 frames to be processed
+before producing its ﬁrst prediction, and therefore does not
+reﬂect the system’s steady-state responsiveness. A more rep-
+resentative measure is the latency from the ﬁrst image to the
+ﬁrst gesture change, which was measured at 2.519 s. This
+indicates that once the LSTM buffer is ﬁlled, the system
+is capable of detecting gesture transitions within a reason-
+able timeframe. In addition, the execution of the gestures
+themselves introduces a temporal component, as a complete
+gesture typically spans several frames (e.g., roughly 0.7 to
+2.5 seconds depending on the gesture, multiplied by the num-
+ber of performed repetitions), which is inherently included
+in the measured latency. Consequently, once the system has
+observed a gesture, subsequent gestures can be recognized
+very quickly, in most cases even before the gesture has fully
+completed. Overall, the real-time performance on the phys-
+ical robot demonstrates that the gesture recognition pipeline
+operates at a sufﬁcient rate for interactive applications, with
+the steady-state latency being well within acceptable bounds.
+7 Limitations
+While the proposed model demonstrates strong performance
+on the test set, the real-world experiments on the humanoid
+robot revealed that the pose prediction is sensitive to varia-
+tions in viewing angles and environmental conditions. These
+factors can negatively impact the quality of the extracted
+motion data and therefore deteriorate the gesture classiﬁca-
+tion. To address this issue, introducing increased landmark
+noise during training may enhance the model’s robustness
+and improve the robustness of the gesture classiﬁcation for
+pose prediction in real-world settings. In addition to these
+limitations, the current method necessitates supervised train-
+ing for each novel gesture category and does not support
+zero-shot learning. This limitation imposes constraints on
+scalability in practical applications where the rapid integra-
+tion of new gestures is imperative. Subsequent research could
+entail the exploration of integrating semantic gestures for
+zero-shot learning. Moreover, although the dataset was col-
+lected from participants varying in race, age, gender, and
+stature, the total number of ten participants remains relatively
+small. This limited participant count may introduce demo-
+graphic bias, as certain body proportions, movement styles,
+or cultural gesture tendencies may be underrepresented.
+While our one-vs-all evaluation (Table6) demonstrates stable
+performance across all subjects, a broader participant pool
+including a wider range of age groups, physical abilities, and
+cultural backgrounds would further strengthen the general-
+izability of the model. Future data collection efforts should
+aim to increase both the number and diversity of participants
+to mitigate potential biases and ensure robust performance
+across a wider population.
+8 Conclusion
+Here’s the updated conclusion: This paper presents a new
+dataset GESTRO for the recognition of gestures in tele-
+operated mobile robotics and a novel gesture recognition
+model GESTRO-LSTM for the efﬁcient interaction between
+humans and robots. Further, it proposes an implementation to
+demonstrate the practical utility and real-time functionality
+of the system.
+The introduced GESTRO dataset contains 3300 samples
+of dynamic gestures split into 11 classes, which have been
+used to transmit basic instructions to mobile systems. The
+dataset constitutes a valuable contribution to the existing cor-
+pus of data on gesture recognition, given the diversity of the
+test subjects and the extensive range of gestures captured. Its
+public availability will facilitate further developments in this
+ﬁeld.
+The presented model employs an LSTM model with an
+attention mechanism for the nuanced interpretation of ges-
+tures, achieving a competitive test accuracy of 98% and
+remarkable robustness across all target classes. These results,
+combined with the model’s lightweight architecture and
+real-time processing capability, make it particularly suited
+123
+
+--- PAGE 12 ---
+51 Page 12 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+for deployment in industrial environments where operators
+need to command mobile robots hands-free. Applications
+include warehouse logistics, manufacturing ﬂoors, or haz-
+ardous areas where physical interfaces are impractical. The
+intuitive nature of the proposed gesture set and the sys-
+tem’s ability to generalize across different users further
+support its applicability in settings with varying operators
+and shifting personnel. As collaborative and autonomous
+mobile robots become increasingly prevalent in industrial
+workﬂows, gesture-based teleoperation offers a natural and
+efﬁcient communication channel that can complement exist-
+ing control modalities and contribute to safer, more ﬂexible
+human-robot collaboration.
+9 Future Work
+Future work will focus on further testing the implemented
+system in unconstrained environments to evaluate its prac-
+tical applicability and reliability in dynamic, real-world
+situations. More precisely, we will integrate the proposed
+method into an autonomous mobile robot designed for pallet
+transportation, where human operators remotely control the
+robot to operate within designated target areas. The study
+will demonstrate the model’s ability to detect gestures effec-
+tively in real, cluttered environments and will provide useful
+insights for enhancing the current system.
+Author Contributions All authors contributed to the manuscript con-
+ception and design. Material preparation, data collection was done by
+Arman Ahmed Khan. Method and analysis were performed by Arman
+Ahmed Khan, Thorsten Hempel and Magnus Jung. The manuscript was
+written by Thorsten Hempel and Magnus Jung and audited by Ayoub Al-
+Hamadi. The project was supervised by Ayoub Al-Hamadi. All authors
+read and approved the ﬁnal manuscript.
+Funding Open Access funding enabled and organized by Projekt
+DEAL. This work was supported in part by the European Regional
+Development Fund (ERDF) through ENABLING under Grant ZS/
+2023/12/182056, and through RoboLab under Grant ZS/2023/12/18
+2065, and by the Federal Ministry of Research, Technology and Space
+of Germany (BMFTR) through Edison under Grant 13N17576.
+Data Availability The keypoint GESTRO dataset will be made publicly
+available on www.github.com/thohemp/gestro along with training, test-
+ing and evaluation scripts.
+Declarations
+Competing Interests The authors have no relevant ﬁnancial or non-
+ﬁnancial interests to disclose.
+Consent to publish The authors afﬁrm that human research participants
+provided informed consent for publication of the images in Figs. 4, 5,
+11.
+Open Access This article is licensed under a Creative Commons
+Attribution 4.0 International License, which permits use, sharing, adap-
+tation, distribution and reproduction in any medium or format, as
+long as you give appropriate credit to the original author(s) and the
+source, provide a link to the Creative Commons licence, and indi-
+cate if changes were made. The images or other third party material
+in this article are included in the article’s Creative Commons licence,
+unless indicated otherwise in a credit line to the material. If material
+is not included in the article’s Creative Commons licence and your
+intended use is not permitted by statutory regulation or exceeds the
+permitted use, you will need to obtain permission directly from the copy-
+right holder. To view a copy of this licence, visit http://creativecomm
+ons.org/licenses/by/4.0/.
+References
+1. Ahmad, K.A., Silpani, D.C., Y oshida, K.: Hand gesture recognition
+by hand landmark classiﬁcation. In: International Symposium on
+Affective Science and Engineering ISASE2022, pp. 1–4. Japan
+Society of Kansei Engineering (2022)
+2. Al, G.A., Estrela, P ., Martinez-Hernandez, U.: Towards an intu-
+itive human-robot interaction based on hand gesture recognition
+and proximity sensors. In: 2020 IEEE International Conference on
+Multisensor Fusion and Integration for Intelligent Systems (MFI),
+pp. 330–335. IEEE (2020)
+3. Al-Hammadi, M., Muhammad, G., Abdul, W., Alsulaiman, M.,
+Hossain, M.S.: Hand gesture recognition using 3d-cnn model. IEEE
+Consum. Electron. Magaz. 9(1), 95–101 (2020). https://doi.org/10.
+1109/MCE.2019.2941464
+4. Alizadegan, H., Rashidi Malki, B., Radmehr, A., Karimi, H., Ilani,
+M.A.: Comparative study of long short-term memory (lstm), bidi-
+rectional lstm, and traditional machine learning approaches for
+energy consumption prediction. Energ. Explor. Exploit. 43(1),
+281–301 (2025)
+5. Ansar, H., Ahmad, J.: Robust hand gesture tracking and recognition
+for healthcare via recurent neural network. In: IBCAST (2023)
+6. Ashish, V .: Attention is all you need. Adv. Neural Inf. Process.
+Syst. 30, I (2017)
+7. Asteriadis, S., Daras, P .: Landmark-based multimodal human
+action recognition. Multimed. Tools Appl. 76, 4505–4521 (2017)
+8. Benitez-Garcia, G., Olivares-Mercado, J., Sanchez-Perez, G.,
+Y anai, K.: Ipn hand: A video dataset and benchmark for real-time
+continuous hand gesture recognition. In: 25th International Confer-
+ence on Pattern Recognition, ICPR 2020, Milan, Italy, Jan 10–15,
+2021, pp. 4340–4347. IEEE (2021)
+9. Contributors, M.: Openmmlab pose estimation toolbox and bench-
+mark. https://github.com/open-mmlab/mmpose (2020)
+10. Cui, J., Ren, B., Guo, Y ., Y ang, S., Han, J., Li, J., Cao, Y .: Method
+for enhanced gesture recognition under low light conditions based
+on wearable mechanoluminescence sensors. Measurement 241,
+115693 (2025)
+11. Dozat, T.: Incorporating Nesterov Momentum into Adam. In:
+Proceedings of the 4th International Conference on Learning Rep-
+resentations, pp. 1–4 (2016)
+12. Fosch-Villaronga, E., Khanna, P ., Drukarch, H., Custers, B.: The
+role of humans in surgery automation: Exploring the inﬂuence
+of automation on human-robot interaction and responsibility in
+surgery innovation. Int. J. Soc. Robot. 15(3), 563–580 (2023)
+13. Gao, Q., Liu, J., Ju, Z., Li, Y ., Zhang, T., Zhang, L.: Static hand
+gesture recognition with parallel cnns for space human-robot inter-
+action. In: Huang, Y ., Wu, H., Liu, H., Yin, Z. (eds.) Intelligent
+Robotics and Applications, pp. 462–473. Springer International
+Publishing, Cham (2017)
+14. Goodfellow, I.: Deep learning (2016)
+123
+
+--- PAGE 13 ---
+Journal of Intelligent & Robotic Systems (2026) 112 :51 Page 13 of 14 51
+15. Hempel., T., Dinges., L., Al-Hamadi., A.: Sentiment-based engage-
+ment strategies for intuitive human-robot interaction. In: Proceed-
+ings of the 18th International Joint Conference on Computer Vision,
+Imaging and Computer Graphics Theory and Applications (VISI-
+GRAPP 2023) - V olume 4: VISAPP , pp. 680–686. INSTICC,
+SciTePress (2023)https://doi.org/10.5220/0011772900003417
+16. Holland, J., Kingston, L., McCarthy, C., Armstrong, E., O’Dwyer,
+P ., Merz, F., McConnell, M.: Service robots in the healthcare sector.
+Robotics 10(1), 47 (2021)
+17. Islam, M.Z., Hossain, M.S., ul Islam, R., Andersson, K.: Static hand
+gesture recognition using convolutional neural network with data
+augmentation. In: 2019 Joint 8th International Conference on Infor-
+matics, Electronics & Vision (ICIEV) and 2019 3rd International
+Conference on Imaging, Vision & Pattern Recognition (icIVPR),
+pp. 324–329 (2019). https://doi.org/10.1109/ICIEV .2019.8858563
+18. Jin, S., Xu, L., Xu, J., Wang, C., Liu, W., Qian, C., Ouyang, W., Luo,
+P .: Whole-body human pose estimation in the wild. In: Proceedings
+of the European Conference on Computer Vision (ECCV) (2020)
+19. Johanson, D.L., Ahn, H.S., Broadbent, E.: Improving interactions
+with healthcare robots: a review of communication behaviours in
+social and healthcare contexts. Int. J. Soc. Robot.13(8), 1835–1850
+(2021)
+20. Ça˘grı Kılıboz, N., Güdükbay, U.: A hand gesture recognition tech-
+nique for human–computer interaction. J. Vis. Commun. Image
+Represent. 28, 97–104 (2015)
+21. Kollakidou, A., Haarslev, F., Odabasi, C., Bodenhagen, L., Krüger,
+N.: Hri-gestures: Gesture recognition for human-robot interac-
+tion. In: Proceedings of the 17th International Joint Conference
+on Computer Vision, Imaging and Computer Graphics Theory and
+Applications, pp. 559–566. SCITEPRESS Digital Library (2022)
+22. Laplaza, J., Romero, R., Sanfeliu, A., Garrell, A.: Body gesture
+recognition to control a social mobile robot. In: Companion of
+the 2023 ACM/IEEE International Conference on Human-Robot
+Interaction, HRI ’23, p. 456–460. Association for Computing
+Machinery, New Y ork, NY , USA (2023).https://doi.org/10.1145/
+3568294.3580126
+23. Linardakis, M., V arlamis, I., Papadopoulos, G.T.: Survey on
+hand gesture recognition from visual input. arXiv preprint
+arXiv:2501.11992 (2025)
+24. Liu, J., Shahroudy, A., Perez, M., Wang, G., Duan, L.Y ., Kot, A.C.:
+Ntu rgb+d 120: A large-scale benchmark for 3d human activity
+understanding. IEEE Trans. Pattern Anal. Mach. Intell. 42(10),
+2684–2701 (2020). https://doi.org/10.1109/TPAMI.2019.2916873
+25. Lugaresi, C., Tang, J., Nash, H., Mcclanahan, C., Uboweja, E.,
+Hays, M., Zhang, F., Chang, C.L., Y ong, M.G., Lee, J., Chang,
+W.T., Hua, W., Georg, M., Grundmann, M., Research, G.: Medi-
+aPipe: A Framework for Building Perception Pipelines (2019).
+arxiv:1906.08172v1
+26. Lyu, L., Wang, D., Zhang, S., Zhao, Y ., Zhou, S.: Static gesture
+recognition using cnn with hand landmark detection. In: 2nd Inter-
+national Conference on Artiﬁcial Intelligence, Automation, and
+High-Performance Computing (AIAHPC 2022), vol. 12348, pp.
+142–148. SPIE (2022)
+27. Materzynska, J., Berger, G., Bax, I., Memisevic, R.: The jester
+dataset: A large-scale video dataset of human gestures. In: 2019
+IEEE/CVF International Conference on Computer Vision Work-
+shop (ICCVW), pp. 2874–2882 (2019). https://doi.org/10.1109/
+ICCVW.2019.00349
+28. Molchanov, P ., Gupta, S., Kim, K., Kautz, J.: Hand gesture recog-
+nition with 3d convolutional neural networks. In: 2015 IEEE
+Conference on Computer Vision and Pattern Recognition Work-
+shops (CVPRW), pp. 1–7 (2015).https://doi.org/10.1109/CVPRW.
+2015.7301342
+29. Molchanov, P ., Y ang, X., Gupta, S., Kim, K., Tyree, S., Kautz,
+J.: Online detection and classiﬁcation of dynamic hand gestures
+with recurrent 3d convolutional neural networks. In: 2016 IEEE
+Conference on Computer Vision and Pattern Recognition (CVPR),
+pp. 4207–4215 (2016). https://doi.org/10.1109/CVPR.2016.456
+30. Moriuchi, E., Murdy, S.: The role of robots in the service industry:
+Factors affecting human-robot interactions. Int. J. Hosp. Manag.
+118, 103682 (2024)
+31. Pages, J., Marchionni, L., Ferro, F.: Tiago: the modular robot that
+adapts to different research needs. In: International workshop on
+robot modularity, IROS, vol. 290 (2016)
+32. Pagès, J., Marchionni, L., Ferro, F.: Tiago: the modular robot
+that adapts to different research needs (2016). https://api.
+semanticscholar.org/CorpusID:218478582
+33. Perera, A.G., Law, Y .W., Chahl, J.: Uav-gesture: A dataset for uav
+control and gesture recognition. In: Leal-Taixé, L., Roth, S. (eds.)
+Computer Vision - ECCV 2018 Workshops, pp. 117–128. Springer
+International Publishing, Cham (2019)
+34. Pinto, R.F., Jr., Borges, C.D.B., Almeida, A.M.A., Paula,
+I.C., Jr.: Static hand gesture recognition based on convolu-
+tional neural networks. J. Electric. Computer Eng. 2019(1),
+4167890 (2019). https://doi.org/10.1155/2019/4167890 . https://
+onlinelibrary.wiley.com/doi/abs/10.1155/2019/4167890
+35. Qi, J., Ma, L., Cui, Z., Y u, Y .: Computer vision-based hand gesture
+recognition for human-robot interaction: a review. Compl. Intell.
+Syst. 10(1), 1581–1606 (2024)
+36. Rodríguez-Guerra, D., Sorrosal, G., Cabanes, I., Calleja, C.:
+Human-robot interaction review: Challenges and solutions for
+modern industrial environments. IEEE Access 9, 108557–108578
+(2021). https://doi.org/10.1109/ACCESS.2021.3099287
+37. Samaan, G.H., Wadie, A.R., Attia, A.K., Asaad, A.M., Kamel,
+A.E., Slim, S.O., Abdallah, M.S., Cho, Y .I.: Mediapipe’s land-
+marks with rnn for dynamic sign language recognition. Electron-
+ics 11(19), (2022). https://doi.org/10.3390/electronics11193228.
+https://www.mdpi.com/2079-9292/11/19/3228
+38. Sarma, S., Sai Ram Mohan, G., Sehgal, H., Sur, A.: Zero-shot
+underwater gesture recognition. In: International Conference on
+Pattern Recognition, pp. 346–361. Springer (2025)
+39. Schneiders, E., Kanstrup, A.M., Kjeldskov, J., Skov, M.B.: Domes-
+tic robots and the dream of automation: Understanding human
+interaction and intervention. In: Proceedings of the 2021 CHI Con-
+ference on Human Factors in Computing Systems, pp. 1–13 (2021)
+40. Shukla, D., Erkent, O., Piater, J.: A Multi-View Hand Ges-
+ture RGB-D Dataset for Human-Robot Interaction Scenarios.
+In: International Symposium on Robot and Human Interactive
+Communication. IEEE (2016). https://doi.org/10.1109/ROMAN.
+2016.7745243. https://iis.uibk.ac.at/public/papers/Shukla-2016-
+ROMAN.pdf.N e wY o r k ,U S A
+41. Søraa, R.A., Tøndel, G., Kharas, M.W., Serrano, J.A.: What
+do older adults want from social robots? a qualitative research
+approach to human-robot interaction (hri) studies. Int. J. Soc.
+Robot. 15(3), 411–424 (2023)
+42. Strazdas, D., Hintz, J., Al-Hamadi, A.: Robo-hud: Interaction con-
+cept for contactless operation of industrial cobotic systems. Appl.
+Sci. 11(12), (2021). https://doi.org/10.3390/app11125366. https://
+www.mdpi.com/2076-3417/11/12/5366
+43. Strazdas, D., Hintz, J., Felßberg, A.M., Al-Hamadi, A.: Robots and
+wizards: An investigation into natural human–robot interaction.
+IEEE Access 8, 207635–207642 (2020). https://doi.org/10.1109/
+ACCESS.2020.3037724
+44. Strazdas, D., Hintz, J., Khalifa, A., Abdelrahman, A.A., Hempel,
+T., Al-Hamadi, A.: Robot system assistant (rosa): Towards intuitive
+multi-modal and multi-device human-robot interaction. Sensors
+22(3), 923 (2022)
+45. Tan, J.C.A., Chan, W.P ., Robinson, N.L., Croft, E.A., Kulic, D.:
+A proposed set of communicative gestures for human robot inter-
+action and an rgb image-based gesture recognizer implemented in
+ros (2021)
+123
+
+--- PAGE 14 ---
+51 Page 14 of 14 Journal of Intelligent & Robotic Systems (2026) 112 :51
+46. Thimmaraju, M.K., Hussain, M.A., Garige, A.K., Chandupatla,
+V ., Billah, A.M.: Automation and robotics in healthcare industry
+for monitoring patients in critical care unit. In: Computer Science
+Engineering and Emerging Technologies, pp. 624–629. CRC Press
+(2024)
+47. V emuri, N., Thaneeru, N.: Enhancing human-robot collaboration
+in industry 4.0 with ai-driven hri. Power Syst. Technol.47(4), 341–
+358 (2023)
+48. Wan, J., Li, S.Z., Zhao, Y ., Zhou, S., Guyon, I., Escalera, S.:
+Chalearn looking at people rgb-d isolated and continuous datasets
+for gesture recognition. In: 2016 IEEE Conference on Computer
+Vision and Pattern Recognition Workshops (CVPRW), pp. 761–
+769 (2016). https://doi.org/10.1109/CVPRW.2016.100
+49. Wang, Z., Li, W., Zhang, J., Zhou, Y ., Chen, S., Dai, Y ., Song, J.,
+Cheng, Y ., Du, X.: A mixed reality-based aircraft cable harness
+installation assistance system with fully occluded gesture recogni-
+tion. Robot. Comput.-Integr. Manuf. 93, 102930 (2025)
+50. Zeghoud, S., Ali, S.G., Ertugrul, E., Kamel, A., Sheng, B., Li,
+P ., Chi, X., Kim, J., Mao, L.: Real-time spatial normalization for
+dynamic gesture classiﬁcation. Vis. Comput. 38(4), 1345–1357
+(2022). https://doi.org/10.1007/s00371-021-02229-9
+51. Zhan, F.: Hand gesture recognition with convolution neural net-
+works. In: 2019 IEEE 20th International Conference on Informa-
+tion Reuse and Integration for Data Science (IRI), pp. 295–298
+(2019). https://doi.org/10.1109/IRI.2019.00054
+52. Zhang, Y ., Cao, C., Cheng, J., Lu, H.: Egogesture: A new dataset
+and benchmark for egocentric hand gesture recognition. IEEE
+Trans. Multimedia 20(5), 1038–1050 (2018). https://doi.org/10.
+1109/TMM.2018.2808769
+Publisher’s Note Springer Nature remains neutral with regard to juris-
+dictional claims in published maps and institutional afﬁliations.
+Thorsten Hempel was born in Pinneberg, Schleswig-Holstein, Ger-
+many, in 1993. He received the M.S. degree in industrial engineering
+from the Otto-von-Guericke University of Magdeburg, Germany, in
+2019, and the Dr.-Ing. degree in AI and Robotics from the Otto-von-
+Guericke University of Magdeburg, Germany, in 2025. His research
+interests include robot vision, robot navigation, and human-robot
+interaction.
+Magnus Jung received his B.Sc. in Systems Engineering and Tech-
+nical Cybernetics from Otto von Guericke University Magdeburg,
+Germany, and his M.Sc. in Technical Cybernetics and Systems The-
+ory from Technische Universität Ilmenau, Germany. He is currently
+pursuing his Ph.D. at Otto von Guericke University Magdeburg. His
+research focuses on human-robot interaction, particularly multimodal
+perception and vision-based cues, combining computer vision and
+machine learning to enable robust and natural interaction in dynamic
+and unconstrained environments.
+Arman Ahmed Khan was born in Ferozepur Jhirka, Haryana, India
+in 1995. He received a Bachelor’s degree in Electronics and Com-
+munication Engineering from G.D. Goenka University, India, and a
+Master’s degree in Electrical Engineering and Information Technol-
+ogy from Otto von Guericke University of Magdeburg, Germany. He
+is pursuing a PhD in Robotics from CELISCA, University of
+Rostock—his research focuses on human-robot interaction, Computer
+vision, and robotics.
+Ayoub Al-Hamadi received the Ph.D. degree in technical computer sci-
+ence, in 2001, and the Habilitation degree in artiﬁcial intelligence and
+the V enia Legendi degree in pattern recognition and image processing
+from Otto-von-Guericke University Magdeburg, Germany, in 2010.
+He is currently a Professor and the Head of the Neuro-Information
+Technology Group, Otto-von-Guericke University Magdeburg. He is
+the author of more than 380 papers in peer-reviewed international
+journals, conferences, and books. His research interests include com-
+putervision, pattern recognition, and image processing.
+123

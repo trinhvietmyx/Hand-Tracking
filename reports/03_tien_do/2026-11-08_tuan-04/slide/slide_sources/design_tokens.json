@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "name": "Ocean Depths",
+    "primary": "1A2332",
+    "accent": "2D8B8B",
+    "secondary": "A8DADC",
+    "light": "F1FAEE",
+    "content_background": "FFFFFF",
+    "font": "Arial",
+    "font_reason": "Font Office hỗ trợ tiếng Việt, đã kiểm tra trực tiếp bằng PowerPoint."
+  },
+  "palette": {
+    "ink": "1A2332",
+    "teal": "2D8B8B",
+    "mint": "A8DADC",
+    "pale": "EFF7F7",
+    "gray": "526270",
+    "grid": "DDE5E8",
+    "white": "FFFFFF",
+    "red": "A23D32",
+    "pink": "FCEDEA"
+  },
+  "layout": "LAYOUT_WIDE",
+  "width": 13.333333,
+  "height": 7.5,
+  "font": "Arial",
+  "titlePt": 31,
+  "bodyPt": "17–24",
+  "tablePt": "14.2–17",
+  "sourcePt": 10.3
+}

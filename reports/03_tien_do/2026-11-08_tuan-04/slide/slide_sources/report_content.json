@@ -1,0 +1,210 @@
+{
+  "references": [
+    {
+      "id": 1,
+      "short": "IPN HandS",
+      "authors": "G. Benitez-Garcia, J. Olivares-Mercado, G. Sanchez-Perez, and H. Takahashi",
+      "title": "IPN HandS: Efficient Annotation Tool and Dataset for Skeleton-Based Hand Gesture Recognition",
+      "venue": "Applied Sciences, vol. 15, no. 11, Art. 6321",
+      "year": 2025,
+      "doi": "10.3390/app15116321",
+      "url": "https://www.mdpi.com/2076-3417/15/11/6321",
+      "local": "reference/06_IPN_HandS_Applied_Sciences_2025/06_IPN_HandS_Applied_Sciences_2025.pdf",
+      "evidence": "Bảng 1, trang 4; mục 5.1–5.2, trang 13–14; Bảng 6, trang 15."
+    },
+    {
+      "id": 2,
+      "short": "SKETCH",
+      "authors": "S. H. Han et al.",
+      "title": "Doodle to Detect: A Goofy but Powerful Approach to Skeleton-based Hand Gesture Recognition",
+      "venue": "Advances in Neural Information Processing Systems, vol. 38, NeurIPS",
+      "year": 2025,
+      "doi": "10.52202/085713-4682",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/ccf308ecd36579d82532851419c283cd-Abstract-Conference.html",
+      "local": "reference/02_SKETCH_NeurIPS_2025/02_SKETCH_Doodle_to_Detect_NeurIPS_2025.pdf",
+      "evidence": "Bảng 1, trang 8; Bảng 2, trang 9; hạn chế tại mục 5.1, trang 10."
+    },
+    {
+      "id": 3,
+      "short": "ConvMixFormer",
+      "authors": "M. Garg, D. Ghosh, and P. M. Pradhan",
+      "title": "ConvMixFormer- A Resource-Efficient Convolution Mixer for Transformer-Based Dynamic Hand Gesture Recognition",
+      "venue": "Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision, pp. 6156–6166",
+      "year": 2025,
+      "doi": null,
+      "url": "https://openaccess.thecvf.com/content/WACV2025/html/Garg_ConvMixFormer-_A_Resource-Efficient_Convolution_Mixer_for_Transformer-Based_Dynamic_Hand_Gesture_WACV_2025_paper.html",
+      "local": "reference/04_ConvMixFormer_WACV_2025/04_ConvMixFormer_WACV_2025.pdf",
+      "evidence": "Bảng 1, trang PDF 5; mục 4.1–4.3, trang PDF 5–6; Bảng 6, trang PDF 8."
+    },
+    {
+      "id": 4,
+      "short": "MediaPipe Hands",
+      "authors": "F. Zhang et al.",
+      "title": "MediaPipe Hands: On-device Real-time Hand Tracking",
+      "venue": "arXiv:2006.10214",
+      "year": 2020,
+      "doi": "10.48550/arXiv.2006.10214",
+      "url": "https://arxiv.org/abs/2006.10214",
+      "local": null,
+      "evidence": "Tác giả, tiêu đề, năm và mô tả bộ phát hiện lòng bàn tay kết hợp mô hình landmark trên arXiv."
+    },
+    {
+      "id": 5,
+      "short": "LSTM",
+      "authors": "S. Hochreiter and J. Schmidhuber",
+      "title": "Long Short-Term Memory",
+      "venue": "Neural Computation, vol. 9, no. 8, pp. 1735–1780",
+      "year": 1997,
+      "doi": "10.1162/neco.1997.9.8.1735",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/9377276/",
+      "local": null,
+      "evidence": "Thông tin thư mục và tóm tắt của công trình gốc."
+    },
+    {
+      "id": 6,
+      "short": "PyTorch LSTM",
+      "authors": "PyTorch Contributors",
+      "title": "torch.nn.LSTM",
+      "venue": "Official PyTorch documentation, version 2.15",
+      "year": 2026,
+      "doi": null,
+      "url": "https://docs.pytorch.org/docs/2.15/generated/torch.nn.LSTM.html",
+      "local": null,
+      "evidence": "Mô tả đầu vào, đầu ra và tham số LSTM. Môi trường hiện cài torch 2.15.0+cpu."
+    },
+    {
+      "id": 7,
+      "short": "Hand Landmarker",
+      "authors": "Google AI Edge",
+      "title": "Hand Landmarker",
+      "venue": "Official MediaPipe documentation",
+      "year": 2026,
+      "doi": null,
+      "url": "https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker?tab=Python",
+      "local": null,
+      "evidence": "21 điểm bàn tay, các chế độ xử lý và đầu vào video có timestamp."
+    }
+  ],
+  "progress": [
+    [
+      "Nghiên cứu tài liệu",
+      "Đã có tài liệu và đối chiếu",
+      "6 PDF trong reference; phân tích sâu [1]–[3]",
+      "Chưa tái lập benchmark công khai"
+    ],
+    [
+      "Thu thập dữ liệu",
+      "Đã có 250 clip",
+      "manifest, video và NPZ; 150/50/50 clip",
+      "Cần thống nhất lại quy cách động tác"
+    ],
+    [
+      "Tiền xử lý",
+      "Đã triển khai và kiểm tra",
+      "features.py, SequenceBuffer, dataset-check",
+      "Chưa đo ảnh hưởng của từng đặc trưng"
+    ],
+    [
+      "Xây dựng mô hình",
+      "Đã triển khai",
+      "GestureLSTM, 1 tầng, 64 nút ẩn, 5 lớp",
+      "Chưa có mô hình đối chứng"
+    ],
+    [
+      "Huấn luyện",
+      "Đã có log 30 epoch",
+      "notebook, checkpoint epoch 23",
+      "Chưa có thống kê nhiều seed"
+    ],
+    [
+      "Đánh giá clip",
+      "Đã đo trên 50 clip test",
+      "40/50 đúng, Macro-F1 0,7619",
+      "Vuốt lên chỉ đúng 1/10"
+    ],
+    [
+      "Tích hợp hệ thống",
+      "Đã có mã nguồn",
+      "app.py, control.py, F8/F9 và bộ xác nhận",
+      "Chưa có đo lường thao tác trực tiếp"
+    ],
+    [
+      "Kiểm thử thực tế",
+      "Còn thiếu phép thử có ghi nhận",
+      "60 test tự động qua; video phát lại clip",
+      "Chưa có dữ liệu thực nghiệm cho 40 lượt và 5 phút nền"
+    ]
+  ],
+  "plan": [
+    {
+      "week": 5,
+      "dates": "09–15/11",
+      "goal": "Đọc sâu bài báo, giải thích code và xử lý lỗi lên/xuống",
+      "work": "Đọc mục 5.1–5.3 của IPN HandS; đối chiếu features/model/training; chạy trace một clip; chốt cử chỉ với GVHD và phân tích lỗi trước khi thu bù.",
+      "output": "Phiếu đọc bài báo, sơ đồ luồng code, trace một clip, quy cách cử chỉ và phân tích lỗi lên/xuống.",
+      "acceptance": "Chỉ được bài gốc và các hàm tương ứng; giải thích 44/30/64/5; phân biệt code đồ án với code tác giả; mọi sửa dữ liệu/mô hình chọn bằng validation.",
+      "risk": "Cách làm cử chỉ thay đổi khiến dữ liệu cũ không còn phù hợp.",
+      "backup": "Chốt năm nhãn và một điều kiện quay trước, thu lại nhóm mẫu bị ảnh hưởng."
+    },
+    {
+      "week": 6,
+      "dates": "16–22/11",
+      "goal": "Đo nhận diện và điều khiển trực tiếp",
+      "work": "Thử 10 lượt mỗi hướng; 5 phút tay nghỉ; đo FPS và thời gian từ cử chỉ tới lệnh.",
+      "output": "CSV 40 lượt, log 5 phút nền, cấu hình ngưỡng và cách đo thời gian.",
+      "acceptance": "Ghi đúng/sai/bỏ sót/lặp cho đủ 40 lượt; đủ 5 phút; F8/F9 hoạt động khi ứng dụng đích có focus.",
+      "risk": "Nhận nhầm hoặc phát nhiều lệnh cho một động tác.",
+      "backup": "Điều chỉnh bằng dữ liệu phát triển, tăng thời gian nghỉ và giữ bộ thử cuối sau khi khóa cấu hình."
+    },
+    {
+      "week": 7,
+      "dates": "23–29/11",
+      "goal": "Sửa lỗi điều khiển và thử tình huống lỗi",
+      "work": "Thử mất tay, hai tay, bật lại, camera lỗi; sửa theo lỗi quan sát được.",
+      "output": "Checklist có kết quả và phiên bản chạy demo.",
+      "acceptance": "Mỗi lần vuốt tạo tối đa một lệnh; mất tay không phát lệnh; dừng toàn cục hoạt động.",
+      "risk": "Tốc độ xử lý thấp hoặc chuỗi bị ngắt nhiều.",
+      "backup": "Đo từng phần, điều chỉnh nhịp lấy mẫu đồng nhất giữa train và runtime rồi thử lại."
+    },
+    {
+      "week": 8,
+      "dates": "30/11–06/12",
+      "goal": "Đánh giá cuối và khóa cấu hình",
+      "work": "Chốt mô hình/ngưỡng; đánh giá trên tập giữ lại; tổng hợp metric và lỗi.",
+      "output": "Checkpoint cuối, confusion matrix, bảng thao tác trực tiếp và video demo.",
+      "acceptance": "Có tệp kết quả, mã phiên và điều kiện thử đủ để kiểm tra lại.",
+      "risk": "Test đã được xem nhiều lần trong quá trình phát triển.",
+      "backup": "Thu một phiên test mới sau khi chốt quy cách và cấu hình, báo rõ giao thức mới."
+    },
+    {
+      "week": 9,
+      "dates": "07–13/12",
+      "goal": "Hoàn thiện bản báo cáo và nhận góp ý",
+      "work": "Viết phương pháp/kết quả/hạn chế; hoàn thiện slide; gửi GVHD và hẹn ký phiếu.",
+      "output": "Báo cáo đầy đủ, slide, video và nhật ký các tuần.",
+      "acceptance": "Số liệu khớp tệp gốc; trích dẫn có nguồn; GVHD nhận được bản xem trước.",
+      "risk": "Thiếu số liệu hoặc chậm nhận phản hồi.",
+      "backup": "Gửi bản đủ nội dung sớm, đánh dấu rõ mục còn chờ góp ý."
+    },
+    {
+      "week": 10,
+      "dates": "14–20/12",
+      "goal": "Sửa góp ý và chuẩn bị nộp",
+      "work": "Sửa báo cáo, chạy demo trên máy bảo vệ, lấy chữ ký GVHD, scan phiếu và sao lưu.",
+      "output": "Bộ hồ sơ sẵn sàng nộp LMS từ 21–27/12.",
+      "acceptance": "Mở được mọi tệp; bản scan rõ chữ ký; demo chạy được; kiểm tra yêu cầu LMS.",
+      "risk": "Lỗi môi trường sát hạn hoặc thiếu chữ ký.",
+      "backup": "Giữ môi trường đã chạy và video dự phòng, hẹn GVHD trước tuần cuối."
+    }
+  ],
+  "theme": {
+    "name": "Ocean Depths",
+    "primary": "1A2332",
+    "accent": "2D8B8B",
+    "secondary": "A8DADC",
+    "light": "F1FAEE",
+    "content_background": "FFFFFF",
+    "font": "Arial",
+    "font_reason": "Font Office hỗ trợ tiếng Việt, đã kiểm tra trực tiếp bằng PowerPoint."
+  }
+}

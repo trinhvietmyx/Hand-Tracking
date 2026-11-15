@@ -1,0 +1,99 @@
+{
+  "train_frames": [
+    {
+      "asset": "train-left-1.png",
+      "raw_path": "data/raw/train/SWIPE_LEFT/pilot_01_deef114fb7434d4ebb0d5985606a5de2.avi",
+      "timestamp_ms": 150
+    },
+    {
+      "asset": "train-left-2.png",
+      "raw_path": "data/raw/train/SWIPE_LEFT/pilot_01_deef114fb7434d4ebb0d5985606a5de2.avi",
+      "timestamp_ms": 750
+    },
+    {
+      "asset": "train-left-3.png",
+      "raw_path": "data/raw/train/SWIPE_LEFT/pilot_01_deef114fb7434d4ebb0d5985606a5de2.avi",
+      "timestamp_ms": 1250
+    }
+  ],
+  "video": {
+    "asset": "demo_test.mp4",
+    "kind": "Playback of stored test clips with predictions from the complete sequence",
+    "seconds": 10,
+    "selected_clips": [
+      {
+        "clip_id": "45b473db00f4430bad7f712a3427ff97",
+        "session_id": "test_01",
+        "split": "test",
+        "label_id": "0",
+        "label": "BACKGROUND",
+        "raw_path": "data/raw/test/BACKGROUND/test_01_45b473db00f4430bad7f712a3427ff97.avi",
+        "processed_path": "data/processed/test/BACKGROUND/test_01_45b473db00f4430bad7f712a3427ff97.npz",
+        "created_at": "2026-11-03T16:51:59.778538+00:00",
+        "prediction": "BACKGROUND",
+        "confidence": 0.9924418926239014
+      },
+      {
+        "clip_id": "b676260ac9424251be84fe2c606afeec",
+        "session_id": "test_01",
+        "split": "test",
+        "label_id": "1",
+        "label": "SWIPE_LEFT",
+        "raw_path": "data/raw/test/SWIPE_LEFT/test_01_b676260ac9424251be84fe2c606afeec.avi",
+        "processed_path": "data/processed/test/SWIPE_LEFT/test_01_b676260ac9424251be84fe2c606afeec.npz",
+        "created_at": "2026-11-03T16:52:48.637486+00:00",
+        "prediction": "SWIPE_LEFT",
+        "confidence": 0.9922917485237122
+      },
+      {
+        "clip_id": "e3aae6cd114c4312bddeeeb9c1996d6a",
+        "session_id": "test_01",
+        "split": "test",
+        "label_id": "2",
+        "label": "SWIPE_RIGHT",
+        "raw_path": "data/raw/test/SWIPE_RIGHT/test_01_e3aae6cd114c4312bddeeeb9c1996d6a.avi",
+        "processed_path": "data/processed/test/SWIPE_RIGHT/test_01_e3aae6cd114c4312bddeeeb9c1996d6a.npz",
+        "created_at": "2026-11-03T16:53:37.369561+00:00",
+        "prediction": "SWIPE_RIGHT",
+        "confidence": 0.9917110204696655
+      },
+      {
+        "clip_id": "3bd55bb323444226a3d8c37cdf1a2f92",
+        "session_id": "test_01",
+        "split": "test",
+        "label_id": "3",
+        "label": "SWIPE_UP",
+        "raw_path": "data/raw/test/SWIPE_UP/test_01_3bd55bb323444226a3d8c37cdf1a2f92.avi",
+        "processed_path": "data/processed/test/SWIPE_UP/test_01_3bd55bb323444226a3d8c37cdf1a2f92.npz",
+        "created_at": "2026-11-03T16:54:30.909519+00:00",
+        "prediction": "SWIPE_DOWN",
+        "confidence": 0.9647643566131592
+      },
+      {
+        "clip_id": "138330c703734bd0998570164833f68e",
+        "session_id": "test_01",
+        "split": "test",
+        "label_id": "4",
+        "label": "SWIPE_DOWN",
+        "raw_path": "data/raw/test/SWIPE_DOWN/test_01_138330c703734bd0998570164833f68e.avi",
+        "processed_path": "data/processed/test/SWIPE_DOWN/test_01_138330c703734bd0998570164833f68e.npz",
+        "created_at": "2026-11-03T16:55:15.495377+00:00",
+        "prediction": "SWIPE_DOWN",
+        "confidence": 0.963394045829773
+      }
+    ],
+    "rule": "First test clip of each label, except SWIPE_UP uses the first misclassified test clip to illustrate the observed error"
+  },
+  "copied_images_origin": "documents/Slide-Bao-cao-tien-do/.build-2026-11-08/assets",
+  "images": {
+    "cover.png": "183ca1867876bd6971d4fc3b553a3d8dda2f8d5a42d2eae4af8e48f420767935",
+    "landmarks.png": "4117b7b4a473522522e837ccf79a4d9bcd235f33568825243ea78cc13a6065d7",
+    "train-left-1.png": "842814d9f90d1437ddd49ce7d8bd2886d60f9ec0a051a010077032abc8f34636",
+    "train-left-2.png": "09ad60ec7d1897015fc333d5d195729f754ce1be911ff032fb73a233833597c3",
+    "train-left-3.png": "f67f6b1791abca0b749d6010937ea062889fb9f2bd38cafcb18b4a7b5f751f2c",
+    "up-1.png": "8987478338d08fff2864719e80173a6d06e8762604bc0c2be28369802601fc1e",
+    "up-2.png": "5f0f92b492c986e50e45e7b40dcfb7866f4b7085edb364580f064b2efe008b4e",
+    "up-3.png": "bc9fb3c3e40ec1efa44c5173fbbcf038de6dd8c5d17d6d31acb87d0084cd9850",
+    "video-poster.png": "dcbacebd7d7173d2f952c145ec84b18047c4a31cf099caa5464a634453f26905"
+  }
+}

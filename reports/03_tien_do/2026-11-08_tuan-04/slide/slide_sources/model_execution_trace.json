@@ -1,0 +1,45 @@
+{
+  "kind": "One stored test clip; no retraining or live camera",
+  "raw_clip": "data/raw/test/BACKGROUND/test_01_45b473db00f4430bad7f712a3427ff97.avi",
+  "checkpoint_epoch": 23,
+  "input_shape": [
+    1,
+    30,
+    44
+  ],
+  "lstm_output_shape": [
+    1,
+    30,
+    64
+  ],
+  "hidden_shape": [
+    1,
+    1,
+    64
+  ],
+  "cell_shape": [
+    1,
+    1,
+    64
+  ],
+  "last_timestep_shape": [
+    1,
+    64
+  ],
+  "logits_shape": [
+    1,
+    5
+  ],
+  "true_label": "BACKGROUND",
+  "predicted_label": "BACKGROUND",
+  "confidence": 0.9924418926239014,
+  "forward_matches_explicit_steps": true,
+  "code_locations": [
+    "features.py:extract_features",
+    "features.py:SequenceBuffer.push",
+    "model.py:GestureLSTM.forward",
+    "model.py:predict_gesture",
+    "training.py:train_model"
+  ],
+  "limitations": "This trace proves the execution path for one stored sequence; it is not a reproduction of IPN HandS code."
+}
