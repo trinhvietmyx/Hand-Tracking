@@ -1,0 +1,6 @@
+# Preserve document and media bytes on Windows and mark their diffs as binary.
+*.pdf binary
+*.pptx binary
+*.doc binary
+*.png binary
+*.mp4 binary

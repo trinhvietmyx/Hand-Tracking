@@ -1,0 +1,15 @@
+[submodule "reference/01_S2Gest_ECCV_2026/Source"]
+	path = reference/01_S2Gest_ECCV_2026/Source
+	url = https://github.com/Chen-Ke-Fan/S2Gest
+[submodule "reference/02_SKETCH_NeurIPS_2025/Source"]
+	path = reference/02_SKETCH_NeurIPS_2025/Source
+	url = https://github.com/capableofanything/SKETCH
+[submodule "reference/03_GESTRO_JIRS_2026/Source"]
+	path = reference/03_GESTRO_JIRS_2026/Source
+	url = https://github.com/thohemp/gestro
+[submodule "reference/04_ConvMixFormer_WACV_2025/Source"]
+	path = reference/04_ConvMixFormer_WACV_2025/Source
+	url = https://github.com/mallikagarg/ConvMixFormer
+[submodule "reference/06_IPN_HandS_Applied_Sciences_2025/Source"]
+	path = reference/06_IPN_HandS_Applied_Sciences_2025/Source
+	url = https://github.com/GibranBenitez/IPN-hand

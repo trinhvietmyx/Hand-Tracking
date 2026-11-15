@@ -1,5 +1,6 @@
 .venv/
 __pycache__/
+.ipynb_checkpoints/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
@@ -29,3 +30,8 @@ assets/hand_landmarker/*.task
 outputs/**
 !outputs/README.md
 !outputs/.gitkeep
+
+# Local slide dependencies, review renders and full-length report recordings.
+node_modules/
+reports/**/slide_sources/qa/
+reports/05_video/*.mp4
