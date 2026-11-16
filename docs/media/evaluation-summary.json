@@ -1,0 +1,63 @@
+{
+  "split": "test",
+  "checkpoint_epoch": 23,
+  "samples": 50,
+  "correct": 40,
+  "accuracy": 0.8,
+  "macro_f1": 0.7619047619047619,
+  "class_names": [
+    "BACKGROUND",
+    "SWIPE_LEFT",
+    "SWIPE_RIGHT",
+    "SWIPE_UP",
+    "SWIPE_DOWN"
+  ],
+  "confusion_matrix_axes": {
+    "rows": "actual",
+    "columns": "predicted"
+  },
+  "confusion_matrix": [
+    [
+      10,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      10,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      10,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      9
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      9
+    ]
+  ],
+  "snapshot_date": "2026-11-16",
+  "protocol": "Self-collected clips; split by collection session; not an unseen-person benchmark.",
+  "split_counts": {
+    "train": 150,
+    "validation": 50,
+    "test": 50
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "assets": [
+    {
+      "file": "app-preview.png",
+      "bytes": 58928,
+      "sha256": "142b98ddce46dbbe21c8c57217ac6acc2a365da8fc072881fe078645d0bc416d",
+      "width": 720,
+      "height": 540,
+      "frames": 1
+    },
+    {
+      "file": "badges/jupyter.svg",
+      "bytes": 475,
+      "sha256": "4e0d9c59cdbc5767c77a19fd91027ee4d7ad5391209801c3d051467ba27e9382"
+    },
+    {
+      "file": "badges/mediapipe.svg",
+      "bytes": 478,
+      "sha256": "49d64039b90bba3ef1640397f86fddbef4a4b8a993e47de104e0f702058e679a"
+    },
+    {
+      "file": "badges/opencv.svg",
+      "bytes": 457,
+      "sha256": "b8cd6882e45933f19d03152cba926e67073036fc365c316eb0e273686a640031"
+    },
+    {
+      "file": "badges/python.svg",
+      "bytes": 472,
+      "sha256": "697c05d853e6107cc19526c00549fdcfec4d7fd6f4e9da342b04f933e51f802e"
+    },
+    {
+      "file": "badges/pytorch.svg",
+      "bytes": 454,
+      "sha256": "bf69994c427240c459285349f534bc15122884e1d4467b5abff31733559081ea"
+    },
+    {
+      "file": "badges/tests.svg",
+      "bytes": 463,
+      "sha256": "6d19d9d2b7a717ed6be1c6a75b16f390c8280307294a4702b4f36c28bc5933f8"
+    },
+    {
+      "file": "banner.png",
+      "bytes": 1453826,
+      "sha256": "aef853fbff3c02d119b762a5062cfc10a2b5797a1bb4643018d636ba541b9a3c",
+      "width": 2172,
+      "height": 724,
+      "frames": 1
+    },
+    {
+      "file": "confusion-matrix.png",
+      "bytes": 75660,
+      "sha256": "cc249c4042219fd3adac6c89234becaab171b3265fe0f36353e37cb29b4fd7c1",
+      "width": 1344,
+      "height": 1008,
+      "frames": 1
+    },
+    {
+      "file": "evaluation-summary.json",
+      "bytes": 922,
+      "sha256": "924a8e5674b8717ba8a6a60f72c7860db190517e7edd8e77ecd7102fc4661a69"
+    },
+    {
+      "file": "landmark-demo-still.png",
+      "bytes": 35288,
+      "sha256": "8191fa21f31d9608b6605430a4ab7c583e39df614aaa79103aad4af86d5259ba",
+      "width": 1000,
+      "height": 620,
+      "frames": 1
+    },
+    {
+      "file": "landmark-demo.gif",
+      "bytes": 2328734,
+      "sha256": "68ce41e300a2e06faa7a9d6c7e7771ff74d0b2b623133eeedd834661769071ac",
+      "width": 1000,
+      "height": 620,
+      "frames": 75
+    },
+    {
+      "file": "pipeline.svg",
+      "bytes": 2553,
+      "sha256": "45427c44d4844d0da774198da72bba10d2b3fb31f298ce31dfa5c9f36b68b783"
+    },
+    {
+      "file": "test-results.png",
+      "bytes": 13409,
+      "sha256": "8c1d7c43d2de0a81736ecad2cfd0777127cdad82a27ebd4c8e986af87f4b3200",
+      "width": 1100,
+      "height": 270,
+      "frames": 1
+    }
+  ],
+  "demo_predictions": [
+    {
+      "actual": "BACKGROUND",
+      "predicted": "BACKGROUND",
+      "confidence": 0.9924418926239014
+    },
+    {
+      "actual": "SWIPE_LEFT",
+      "predicted": "SWIPE_LEFT",
+      "confidence": 0.9922917485237122
+    },
+    {
+      "actual": "SWIPE_RIGHT",
+      "predicted": "SWIPE_RIGHT",
+      "confidence": 0.9917110204696655
+    },
+    {
+      "actual": "SWIPE_UP",
+      "predicted": "SWIPE_UP",
+      "confidence": 0.677042543888092
+    },
+    {
+      "actual": "SWIPE_DOWN",
+      "predicted": "SWIPE_DOWN",
+      "confidence": 0.963394045829773
+    }
+  ]
+}

@@ -1,207 +1,381 @@
-# Hand-Tracking
+<p align="center">
+  <img src="docs/media/banner.png" alt="Hand-Tracking — minh họa bàn tay và chuyển động" width="100%">
+</p>
 
-Đồ án một sinh viên: nhận diện bốn cử chỉ vuốt để chuyển slide và cuộn trang.
+<h1 align="center">Hand-Tracking</h1>
 
-Bộ khung bám theo đặc tả 1.1 của đồ án; bản đặc tả được lưu cục bộ trong thư mục reports.
+<p align="center">
+  <strong>Nhận diện cử chỉ tay động để chuyển slide và cuộn trang bằng webcam.</strong><br>
+  Đồ án chuyên ngành với MediaPipe, đặc trưng chuyển động và mô hình LSTM.
+</p>
 
-## Trạng thái hiện tại
+<p align="center">
+  <a href="pyproject.toml"><img src="docs/media/badges/python.svg" alt="Python 3.11–3.12" height="26"></a>
+  <a href="src/hand_tracking/landmarks.py"><img src="docs/media/badges/mediapipe.svg" alt="MediaPipe Hand Landmarker" height="26"></a>
+  <a href="src/hand_tracking/model.py"><img src="docs/media/badges/pytorch.svg" alt="PyTorch LSTM" height="26"></a>
+  <a href="src/hand_tracking/camera.py"><img src="docs/media/badges/opencv.svg" alt="OpenCV Camera" height="26"></a>
+  <a href="notebook/hand_tracking.ipynb"><img src="docs/media/badges/jupyter.svg" alt="JupyterLab Notebook" height="26"></a>
+  <a href="#kiem-thu"><img src="docs/media/badges/tests.svg" alt="60 kiểm thử cục bộ đã đạt ngày 16/11/2026" height="26"></a>
+</p>
 
-Đã chạy được **camera → landmark → 44 đặc trưng → bộ đệm [30,44]** qua lệnh `preview`. Có cửa sổ xem bàn tay, số mẫu đã tích lũy, trạng thái mất tay/hai tay và FPS xử lý. Chế độ này không ghi hình và không gửi thao tác chuột/phím.
+<p align="center">
+  <a href="#demo">Demo</a> ·
+  <a href="#tinh-nang">Tính năng</a> ·
+  <a href="#bat-dau">Bắt đầu</a> ·
+  <a href="#su-dung">Sử dụng</a> ·
+  <a href="#du-lieu-va-huan-luyen">Huấn luyện</a> ·
+  <a href="#ket-qua">Kết quả</a> ·
+  <a href="#notebook">Notebook</a>
+</p>
 
-Đã có **collect** để thu clip có nhãn, **dataset-check** để kiểm tra dữ liệu, **train** để huấn luyện LSTM và **evaluate** để đánh giá các clip test. Lệnh **run** nhận diện qua webcam và gửi lệnh sau khi cử chỉ vượt qua GestureGate. Điều khiển bắt đầu ở OFF; F8 bật/tạm dừng, F9 thoát.
+> **Lần đầu clone:** `preview` cần model landmark; `run` cần thêm checkpoint LSTM đã huấn luyện. Dữ liệu tự thu và checkpoint được giữ trên máy. Làm theo phần [Bắt đầu](#bat-dau) trước khi mở webcam.
 
-[Notebook](notebook/hand_tracking.ipynb) trình bày sáu công trình tham khảo, đọc bài IPN HandS, luồng code và thực nghiệm trên dữ liệu tự thu. [Lời trình bày](notebook/speaker_notes.md) dùng cho buổi báo cáo với giảng viên hướng dẫn. Hai thư mục `reference/` và `reports/` chỉ lưu trên máy và được loại khỏi Git.
+<a id="demo"></a>
+## 🎬 Xem cách dữ liệu chuyển động
 
-## Cấu trúc
+![GIF phát lại landmark của năm clip test với nhãn thật và dự đoán từ toàn bộ clip](docs/media/landmark-demo.gif)
 
-```text
-Hand-Tracking/
-├── configs/default.json        # Camera, chuỗi, LSTM, ngưỡng và đường dẫn
-├── src/hand_tracking/
-│   ├── __main__.py, cli.py     # Lệnh chạy chung
-│   ├── config.py, labels.py    # Cấu hình và năm nhãn dùng chung
-│   ├── camera.py              # Đọc frame và timestamp
-│   ├── landmarks.py           # MediaPipe Hand Landmarker
-│   ├── features.py            # 44 đặc trưng, lấy mẫu và bộ đệm
-│   ├── collection.py          # Thu clip có nhãn
-│   ├── dataset.py             # Xuất/đọc chuỗi [30,44]
-│   ├── model.py               # LSTM một tầng, hidden size 64
-│   ├── training.py            # Huấn luyện và lưu checkpoint
-│   ├── evaluation.py          # Metric và confusion matrix
-│   ├── control.py             # Xác nhận, chống lặp, gửi lệnh
-│   └── app.py                 # Preview và nhận diện/điều khiển webcam
-├── data/
-│   ├── raw/{train,validation,test}/
-│   ├── processed/{train,validation,test}/
-│   ├── sessions/               # Tạo khi thu; metadata mỗi phiên
-│   └── manifest.csv            # Tạo khi có clip đã lưu
-├── assets/hand_landmarker/     # Model landmark đã tải trên máy này
-├── models/                    # Checkpoint LSTM
-├── outputs/                   # Log và kết quả đánh giá
-├── notebook/                  # Nghiên cứu, thực nghiệm và lời trình bày
-├── reference/                 # Tài liệu/mã nguồn tham khảo, chỉ lưu cục bộ
-├── reports/                   # Báo cáo tiến độ/minh chứng, chỉ lưu cục bộ
-├── tests/                     # Cấu hình, I/O, đặc trưng, sampling, preview
-├── docs/ROADMAP.md             # Thứ tự code tiếp
-├── pyproject.toml             # Python package và nhóm phụ thuộc
-└── requirements.txt           # Cài phụ thuộc ứng dụng khi cần
-```
+GIF phát lại **21 điểm bàn tay từ năm clip test đã lưu**, kèm dự đoán của checkpoint thực nghiệm. Nhãn dự đoán được tính từ toàn bộ chuỗi `30 × 44` của từng clip. Có giữ lại ví dụ vuốt lên bị nhầm thành vuốt xuống để phản ánh kết quả hiện tại.
 
-## Môi trường nền móng trên Windows
+Đây là minh họa phát lại dữ liệu, không phải phép đo nhận diện trực tiếp hay demo gửi lệnh điều khiển. [Xem ảnh tĩnh](docs/media/landmark-demo-still.png) · [Nguồn và cách tạo hình](docs/media/README.md).
 
-Chọn Python 3.11 cho dự án. Không dùng nhầm Python mặc định trên máy nếu đang là phiên bản khác.
+<a id="tinh-nang"></a>
+## ✨ Những gì project đã làm được
 
-Mở PowerShell tại thư mục Hand-Tracking:
+- **🖐 Theo dõi bàn tay:** đọc webcam, trích 21 landmark 2D và phát hiện trường hợp mất tay hoặc có nhiều tay.
+- **📐 Tạo đặc trưng theo thời gian:** 42 tọa độ cục bộ và hai tọa độ cổ tay; ghép chuỗi 30 bước ở nhịp lấy mẫu 20 Hz.
+- **🧠 Phân loại năm nhãn:** nền, vuốt trái, vuốt phải, vuốt lên và vuốt xuống bằng LSTM một tầng.
+- **🎛 Xác nhận rồi gửi lệnh:** lọc độ tin cậy, độ ổn định, cooldown và nền; F8 bật/tạm dừng, F9 thoát toàn cục trong chế độ nhận diện có cửa sổ.
+- **📦 Thu và quản lý dữ liệu:** đếm ngược trước khi ghi, tiếp tục phiên còn thiếu, kiểm tra dữ liệu, bỏ mẫu sai vào backup và khôi phục.
+- **📓 Học và thực nghiệm:** notebook đi từ công trình tham khảo đến đặc trưng, forward, huấn luyện, đánh giá và mô phỏng GestureGate.
+
+### Công nghệ đảm nhiệm việc gì?
+
+- **Python:** CLI, cấu hình và xử lý dữ liệu; khai báo hỗ trợ 3.11–3.12, môi trường đã kiểm tra là Python 3.11 trên Windows.
+- **OpenCV + MediaPipe:** đọc ảnh, lấy timestamp, trích landmark và vẽ giao diện xem trước.
+- **NumPy + PyTorch:** tạo chuỗi đặc trưng, huấn luyện và chạy mô hình LSTM.
+- **pynput + PyAutoGUI:** nhận phím nóng toàn cục và gửi phím/cuộn trang sau khi xác nhận cử chỉ.
+- **JupyterLab + Matplotlib:** đọc hiểu code, phát lại dữ liệu và trình bày thực nghiệm.
+
+Các nhóm phụ thuộc được khai báo trong [pyproject.toml](pyproject.toml).
+
+<a id="luong-xu-ly"></a>
+## Luồng xử lý
+
+![Luồng webcam, landmark, đặc trưng, bộ đệm, LSTM, GestureGate và thao tác máy tính](docs/media/pipeline.svg)
+
+Mỗi lần có cửa sổ chuỗi mới, LSTM trả về một nhãn và confidence. Khi bật điều khiển, `GestureGate` quyết định có xác nhận cử chỉ hay chưa. Chỉ cử chỉ đã xác nhận mới được chuyển thành thao tác.
+
+<details>
+<summary><strong>Thông số mặc định và cách xử lý mất tay</strong></summary>
+
+- **Đầu vào:** `30 × 44`; 30 bước lấy mẫu ở 20 Hz, xấp xỉ 1,5 giây chuyển động.
+- **Đặc trưng:** 21 điểm xy được đưa về cùng tỷ lệ ảnh, lấy cổ tay làm gốc và chuẩn hóa theo kích thước lòng bàn tay; nối thêm hai tọa độ cổ tay toàn cục.
+- **Mô hình:** một tầng LSTM, hidden size 64, lấy đầu ra ở bước cuối qua Linear để có năm logits.
+- **Chuỗi bị gián đoạn:** mất tay, hai tay hoặc khoảng hở tracking dài hơn 100 ms làm xóa bộ đệm. Khoảng hở ngắn được nội suy khi đã nhận đủ hai đầu mút.
+- **Nhịp lấy mẫu và FPS:** 20 Hz là nhịp của chuỗi đặc trưng, không phải cam kết tốc độ webcam hay FPS xử lý.
+
+Xem [features.py](src/hand_tracking/features.py), [model.py](src/hand_tracking/model.py) và [cấu hình mặc định](configs/default.json).
+
+</details>
+
+<a id="bat-dau"></a>
+## 🚀 Bắt đầu trên Windows
+
+Cần **Python 3.11**, **Git**, webcam và PowerShell. Các lệnh dưới đây chạy tại thư mục gốc `Hand-Tracking`.
+
+### 1. Clone và tạo môi trường
 
 ```powershell
+git clone https://github.com/trinhvietmyx/Hand-Tracking.git
+cd Hand-Tracking
+
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools
-.\.venv\Scripts\python.exe -m pip install -e .
-.\.venv\Scripts\python.exe -m hand_tracking check
+.\.venv\Scripts\python.exe -m pip install -c requirements-vision.lock.txt -e ".[app]"
 ```
 
-Khi clone từ GitHub, cần tạo lại môi trường và tải model landmark theo hướng dẫn bên dưới. Không cần activate môi trường để dùng các lệnh đầy đủ trên. Dữ liệu tự thu và checkpoint LSTM được lưu cục bộ.
+`requirements-vision.lock.txt` là snapshot nhóm vision đã kiểm tra; nhóm `app` bổ sung PyTorch, PyAutoGUI, pynput và các phụ thuộc của ứng dụng. Không cần activate môi trường khi dùng đường dẫn Python đầy đủ như trên.
 
-CLI `check` in cấu hình, đường dẫn đã resolve, các thư viện hiện có và tài nguyên còn thiếu. Chạy được bằng Python chuẩn; không import MediaPipe/PyTorch, không mở camera và không gửi thao tác chuột/phím. `dependencies: null` hoặc `exists: false` nghĩa là chưa cài/chưa có tài nguyên tương ứng, không phải đã sẵn sàng chạy ứng dụng.
-
-Đường dẫn bên trong JSON tính theo gốc dự án chứa `configs/`, không tính theo working directory. Khi đứng ở thư mục khác, truyền đường dẫn tuyệt đối của cấu hình trước tên lệnh:
+### 2. Tải model landmark
 
 ```powershell
-& 'D:\Learn\Hutech\DACN\Hand-Tracking\.venv\Scripts\python.exe' -m hand_tracking --config 'D:\Learn\Hutech\DACN\Hand-Tracking\configs\default.json' check
+Invoke-WebRequest `
+  -Uri 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' `
+  -OutFile 'assets/hand_landmarker/hand_landmarker.task'
 ```
 
-## Chạy xem trước camera
+Model được đặt đúng vị trí mà cấu hình mặc định sử dụng. [Nguồn và SHA-256](assets/hand_landmarker/README.md) được lưu trong tài liệu tài nguyên.
 
-Mở PowerShell tại Hand-Tracking:
+### 3. Kiểm tra và mở preview
 
 ```powershell
-.\.venv\Scripts\python.exe -m hand_tracking preview
+.\run.bat check
+.\run.bat preview
 ```
 
-Đưa đúng một bàn tay vào camera và giữ trong khung khoảng hai giây. Cửa sổ hiển thị 21 điểm, trạng thái `one_hand`, 44 đặc trưng và bộ đệm tăng đến 30/30. Nhấn **Q**, **Esc** hoặc đóng cửa sổ để thoát. F8/F9 dùng trong chế độ `run`; chế độ `preview` thoát bằng Q/Esc hoặc đóng cửa sổ.
+Đưa **một bàn tay** vào khung hình và quan sát landmark cùng bộ đệm tăng đến `30/30`. Nhấn **Q**, **Esc** hoặc đóng cửa sổ để thoát. `check` chỉ đọc cấu hình, phiên bản thư viện và đường dẫn tài nguyên; không mở camera.
 
-- Không thấy tay, phát hiện hai tay hoặc dữ liệu không hợp lệ: xóa bộ đệm, không ghép với chuỗi trước đó.
-- Khoảng cách hai kết quả quá 100 ms: khởi tạo lại chuỗi. Ảnh camera đến nhanh không tự làm tăng số mẫu lên trên lưới 20 Hz.
-- Tọa độ cục bộ chuẩn hóa theo kích thước lòng bàn tay; cả hai trục dùng cùng tỷ lệ ảnh. Hai giá trị cuối là vị trí cổ tay theo đơn vị cạnh ảnh dài nhất, để giữ hướng chuyển động.
-- `handedness` của tracker phản ánh ảnh đầu vào; không dùng nhãn trái/phải đó để tự lật thêm ảnh hoặc đổi nhãn vuốt.
-- Khi cảnh thay đổi đột ngột, tracker có thể cập nhật số tay chậm hơn một frame; lớp ứng dụng xóa chuỗi ngay khi nhận kết quả nhiều tay.
+![Khung preview do hàm draw_preview của ứng dụng render từ landmark đã lưu trên nền trống](docs/media/app-preview.png)
 
-Đổi camera hoặc chạy thử có giới hạn:
+*Khung hình được tạo bằng hàm `draw_preview()` thật, dùng landmark đã lưu trên nền trống. Đây là ảnh render để minh họa giao diện; giá trị `FPS: 0.0` không phải kết quả đo hiệu năng webcam.*
 
-```powershell
-.\.venv\Scripts\python.exe -m hand_tracking preview --camera-index 1
-.\.venv\Scripts\python.exe -m hand_tracking preview --headless --max-frames 60
-```
+> **Đã xem được bàn tay?** Có thể bắt đầu [thu dữ liệu và huấn luyện](#du-lieu-va-huan-luyen). Lệnh `run` sử dụng checkpoint ở `models/gesture_lstm.pt`; checkpoint này cần có sẵn và khớp cấu hình.
 
-`--headless` bắt buộc có `--max-frames`; lệnh kết thúc bằng thống kê JSON, không lưu hình. FPS tính trên toàn vòng camera/tracking/đặc trưng; không tính mốc nội suy như frame camera mới. `sequences_ready` là số lần có cửa sổ đầy mới, không phải số cử chỉ đã nhận diện.
+<a id="su-dung"></a>
+## 🎛 Sử dụng và điều khiển
 
-## Thu thử dữ liệu có nhãn
-
-Đóng preview, sau đó chạy:
+### Mở menu hoặc gọi lệnh trực tiếp
 
 ```powershell
-.\.venv\Scripts\python.exe -m hand_tracking collect --session pilot_01 --split train --count 10
-```
+# Menu tương tác
+.\run.bat
 
-Mỗi nhãn thu mười clip, tổng 50 clip. **Space → đếm ngược hai giây → RECORDING → một lần vuốt → SAVED**. Đưa tay về vị trí chuẩn khi đang chờ, rồi Space để thu mẫu tiếp. BACKGROUND vẫn cần một tay hiện rõ, đang nghỉ hoặc di chuyển chậm.
-
-Mất tay/hai tay/gap tracking sẽ báo RETRY, không lưu mẫu dở. Q/Esc/đóng cửa sổ dừng; chạy lại cùng lệnh tiếp tục phần còn thiếu, không ghi đè clip cũ. Chỉ chạy một cửa sổ thu tại một thời điểm.
-
-```powershell
-.\.venv\Scripts\python.exe -m hand_tracking dataset-check --split train
-```
-
-Video sạch nằm trong data/raw; đặc trưng [30,44] và timestamp ở data/processed; manifest và metadata session đi cùng dữ liệu. Cần tự xem lại đúng động tác/nhãn trước khi huấn luyện. [Hướng dẫn thu và chia phiên](docs/COLLECTION.md).
-
-Thu sai một clip: thoát collect, dùng `dataset-remove --session pilot_01 --split train --label SWIPE_LEFT --last` để xem trước; thêm `--apply` để chuyển mẫu vào backup và cập nhật manifest. Bỏ `--last` nếu cần bỏ cả nhóm nhãn đó trong phiên. `dataset-restore --backup-id <removal_id> --apply` khôi phục khi bỏ nhầm. Chi tiết và cách thu bù trong hướng dẫn ở trên; không sửa danh sách năm nhãn.
-
-## Cài lại thư viện vision và model
-
-Snapshot đã kiểm tra trên Python 3.11/Windows:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-vision.lock.txt
-.\.venv\Scripts\python.exe -m pip install -e .
-```
-
-Hoặc cài theo khoảng phiên bản khai báo trong pyproject.toml bằng `pip install -e '.[vision]'`. Khi thiết lập máy khác, tải model nếu chưa có:
-
-```powershell
-Invoke-WebRequest -Uri 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' -OutFile 'assets/hand_landmarker/hand_landmarker.task'
-```
-
-Nguồn model và SHA-256 ở assets/hand_landmarker/README.md. `check` và `preview` không tự tải model khi chạy.
-
-## Cài thư viện huấn luyện và điều khiển
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -c requirements-vision.lock.txt -r requirements.txt
-```
-
-Nhóm `app` khai báo thêm PyTorch, PyAutoGUI, pynput và scikit-learn. Tệp `requirements-vision.lock.txt` cố định nhóm vision đã kiểm tra; các thư viện còn lại dùng khoảng phiên bản khai báo trong dự án.
-
-OpenCV dùng gói `opencv-contrib-python`, phù hợp với phụ thuộc MediaPipe; không cài thêm một gói OpenCV khác cùng namespace `cv2`. Xem [hướng dẫn gói OpenCV](https://pypi.org/project/opencv-python/).
-
-Đường camera dùng MediaPipe Tasks Hand Landmarker ở VIDEO mode đồng bộ để kiểm soát timestamp và giải phóng tài nguyên rõ ràng. [Hướng dẫn MediaPipe](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/python).
-
-## Nhận diện và điều khiển webcam
-
-Cần có model landmark và checkpoint LSTM phù hợp cấu hình. Từ gốc dự án:
-
-```powershell
+# Nhận diện và điều khiển khi đã có checkpoint
 .\run.bat run
 ```
 
-Hoặc mở `run.bat` và chọn **7**. F8 bật/tạm dừng, F9 thoát; Q/Esc/đóng cửa sổ cũng thoát. Khi bật điều khiển, ứng dụng yêu cầu confidence từ 80%, ít nhất ba dự đoán mới cùng nhãn và ổn định ít nhất 150 ms. Sau một lệnh, chỉ mở khóa khi hết cooldown 1 giây và có BACKGROUND đủ tin cậy ổn định 300 ms.
+Trong menu: **1** xem trước · **2** kiểm tra môi trường · **3** thu pilot · **4** thu tùy chỉnh · **5** kiểm tra dữ liệu · **6** chạy test · **7** nhận diện/điều khiển · **0** thoát.
 
-Ánh xạ trong code hiện tại: vuốt trái gửi mũi tên trái (slide trước), vuốt phải gửi mũi tên phải (slide tiếp theo), vuốt lên/xuống cuộn tương ứng. PyAutoGUI giữ fail-safe mặc định.
+### Bật, tạm dừng và thoát
 
-## Notebook và tài liệu nghiên cứu
+- **Khởi động ở Control OFF:** có thể quan sát dự đoán trước khi bật gửi lệnh.
+- **F8:** đổi ON/OFF, xóa bộ đệm và trạng thái xác nhận đang chờ.
+- **F9:** yêu cầu thoát dù đang đứng ở cửa sổ khác.
+- **Q / Esc / đóng cửa sổ:** thoát khi tương tác với cửa sổ ứng dụng.
+
+F8/F9 được đăng ký toàn cục khi chạy `run` có cửa sổ. `preview` dùng Q/Esc hoặc đóng cửa sổ. Khi muốn chuyển slide hoặc cuộn trang, đưa ứng dụng đích lên trước để nhận phím/cuộn.
+
+### Ánh xạ đang dùng trong code
+
+- **⬅ Vuốt trái — `SWIPE_LEFT`:** gửi phím **←**, về slide trước.
+- **➡ Vuốt phải — `SWIPE_RIGHT`:** gửi phím **→**, sang slide tiếp theo.
+- **⬆ Vuốt lên — `SWIPE_UP`:** cuộn lên.
+- **⬇ Vuốt xuống — `SWIPE_DOWN`:** cuộn xuống.
+- **✋ Nền — `BACKGROUND`:** không gửi thao tác; dùng để mở khóa sau cử chỉ.
+
+Ánh xạ được lấy từ [control.py](src/hand_tracking/control.py). PyAutoGUI giữ fail-safe mặc định: nếu cơ chế này kích hoạt, chương trình bắt ngoại lệ và dừng.
+
+### Khi nào một lần vuốt được xác nhận?
+
+Với [cấu hình hiện tại](configs/default.json), cử chỉ cần đồng thời đạt:
+
+1. Confidence **từ 80%**.
+2. **Ít nhất ba dự đoán mới liên tiếp** cùng nhãn.
+3. Ổn định **ít nhất 150 ms**.
+
+Sau khi xác nhận, gate khóa cho đến khi **đã qua 1 giây** và thấy **BACKGROUND đủ tin cậy ổn định ít nhất 300 ms**. Cơ chế này hạn chế lặp lệnh khi một chuyển động xuất hiện trong nhiều cửa sổ chuỗi.
+
+### Đổi camera hoặc chạy có giới hạn
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -e ".[app,notebook]"
+.\run.bat preview --camera-index 1
+.\run.bat preview --headless --max-frames 60
+```
+
+`--headless` bắt buộc có `--max-frames`. Cấu hình JSON được resolve theo gốc dự án; tùy chọn `--config` đặt **trước** tên lệnh:
+
+```powershell
+.\run.bat --config configs/default.json check
+```
+
+<a id="du-lieu-va-huan-luyen"></a>
+## 📦 Thu dữ liệu → huấn luyện → đánh giá
+
+### Thu theo các phiên riêng
+
+Ví dụ dưới đây dành cho một bộ dữ liệu mới, tổng **250 clip**: 150 train, 50 validation, 50 test. `--count` là số clip mục tiêu **của từng nhãn**, gồm cả clip đã lưu trong phiên.
+
+```powershell
+.\run.bat collect --session train_01 --split train --count 30
+.\run.bat collect --session val_01 --split validation --count 10
+.\run.bat collect --session test_01 --split test --count 10
+```
+
+Trong cửa sổ thu: **Space → đếm ngược → thực hiện một động tác → SAVED**. `BACKGROUND` vẫn cần một tay hiện rõ, đang nghỉ hoặc chuyển động chậm. Nếu mất tay, hai tay hoặc tracking bị gián đoạn, chương trình yêu cầu `RETRY` và bỏ lượt dở.
+
+Chạy lại cùng lệnh để tiếp tục phiên còn thiếu. Dùng các phiên khác nhau cho train/validation/test và tự xem lại động tác, nhãn trước khi huấn luyện.
+
+```powershell
+.\run.bat dataset-check --split train
+.\run.bat dataset-check --split validation
+.\run.bat dataset-check --split test
+```
+
+Video sạch lưu ở `data/raw/`, chuỗi NPZ ở `data/processed/`; `data/manifest.csv` liên kết clip với nhãn và `data/sessions/` giữ metadata từng phiên. Xem [hướng dẫn thu dữ liệu](docs/COLLECTION.md).
+
+<details>
+<summary><strong>Thu nhầm mẫu? Xem trước việc bỏ mẫu và khôi phục từ backup</strong></summary>
+
+```powershell
+# Chỉ xem trước, chưa chuyển file
+.\run.bat dataset-remove --session train_01 --split train --label SWIPE_LEFT --last
+
+# Chuyển mẫu đã chọn vào backup và cập nhật manifest
+.\run.bat dataset-remove --session train_01 --split train --label SWIPE_LEFT --last --apply
+
+# Thay <removal_id> bằng mã backup mà lệnh trên in ra
+.\run.bat dataset-restore --backup-id <removal_id> --apply
+```
+
+Bỏ `--last` để chọn toàn bộ nhóm nhãn đó trong phiên. Đọc kết quả xem trước trước khi dùng `--apply`; chi tiết nằm trong [COLLECTION.md](docs/COLLECTION.md).
+
+</details>
+
+### Huấn luyện LSTM và đánh giá test
+
+```powershell
+.\run.bat train --epochs 30
+.\run.bat evaluate
+```
+
+Huấn luyện dùng batch 16, Adam với learning rate `0.001` và seed 42. Sau mỗi epoch, code đo validation loss và lưu checkpoint tốt nhất tại `models/gesture_lstm.pt`. `evaluate` đọc tập test và ghi `outputs/evaluation.json` với accuracy, Macro-F1, metric từng lớp và ma trận nhầm lẫn.
+
+Dùng validation để chọn cấu hình. Nếu đã dựa vào lỗi trên test để điều chỉnh mô hình, cần một tập kiểm tra độc lập cho lần đánh giá cuối.
+
+<a id="ket-qua"></a>
+## 📊 Kết quả thực nghiệm hiện có
+
+Snapshot được đối chiếu ngày **16/11/2026**, lấy từ `outputs/notebook/evaluation.json` với checkpoint thực nghiệm riêng của notebook:
+
+- **Dữ liệu:** 250 clip tự thu; chia theo phiên thành **150 / 50 / 50** cho train / validation / test.
+- **Checkpoint:** chọn ở **epoch 23** trong lượt huấn luyện 30 epoch.
+- **Test:** **40/50 clip đúng**, accuracy **80%**, Macro-F1 **0.7619**.
+
+![Ma trận nhầm lẫn thật: lỗi tập trung giữa SWIPE_UP và SWIPE_DOWN](docs/media/confusion-matrix.png)
+
+Trong tập test này, nền, vuốt trái và vuốt phải đều đúng 10/10 clip của từng lớp. Vuốt lên đúng 1/10, với chín clip bị đoán thành vuốt xuống; vuốt xuống đúng 9/10.
+
+Đây là kết quả **phân loại clip chia theo phiên**. Chưa có đánh giá độc lập theo người mới hoặc bộ số liệu về đúng lệnh, sai lệnh và độ trễ khi điều khiển webcam liên tục. Chưa xác định được nguyên nhân cuối cùng của lỗi hai hướng dọc.
+
+[Xem số liệu rút gọn](docs/media/evaluation-summary.json) · [Notebook thực nghiệm](notebook/hand_tracking.ipynb).
+
+<a id="notebook"></a>
+## 📓 Notebook và hướng nghiên cứu
+
+Notebook được tổ chức theo trình tự: **các công trình liên quan → bài đọc chính → code tác giả → code đồ án → thực nghiệm → giới hạn và hướng tiếp theo**.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[notebook]"
+.\.venv\Scripts\python.exe -m ipykernel install --prefix .venv --name hand-tracking --display-name "Python (Hand-Tracking)"
 .\.venv\Scripts\python.exe -m jupyterlab notebook
 ```
 
-Chọn kernel thuộc môi trường `.venv` và chạy các ô từ trên xuống. Notebook dùng checkpoint riêng tại `models/notebook/gesture_lstm.pt` và kết quả tại `outputs/notebook/`. Các tệp này cùng dữ liệu tự thu cần được tạo hoặc cung cấp lại trên máy mới.
+Chọn kernel **Python (Hand-Tracking)** và chạy từ trên xuống để có đủ biến/import. Có thể dùng **Run All Cells** trước buổi báo cáo; phần huấn luyện chạy 30 epoch. Notebook lưu checkpoint tại `models/notebook/gesture_lstm.pt`, kết quả tại `outputs/notebook/`, tách với đường dẫn mặc định của ứng dụng.
 
-Các ô notebook đọc PDF hoặc mã nguồn tham khảo cần thư mục `reference/` có sẵn trên máy. Thư mục này được giữ cục bộ; clone từ GitHub không kèm bài báo và repo tham khảo. Bản thực nghiệm đồ án chưa tái lập benchmark LSTM gốc của IPN HandS.
+- [Mở notebook](notebook/hand_tracking.ipynb).
+- [Lời trình bày với giảng viên hướng dẫn](notebook/speaker_notes.md).
+- Bài đọc chính: [IPN HandS — Applied Sciences 2025](https://www.mdpi.com/2076-3417/15/11/6321), tham khảo hướng landmark 2D và baseline LSTM ở mục 5.
 
-## Các lệnh CLI
+Đồ án điều chỉnh số đặc trưng, kiến trúc, lớp nhãn và dữ liệu so với bài báo; chưa tái lập benchmark LSTM gốc của IPN HandS. Sáu nguồn tham khảo cùng thông tin công bố được ghi trong notebook.
 
-```powershell
-.\.venv\Scripts\python.exe -m hand_tracking --help
-.\.venv\Scripts\python.exe -m hand_tracking collect --session pilot_01 --split train --count 10
-.\.venv\Scripts\python.exe -m hand_tracking dataset-check --split train
-.\.venv\Scripts\python.exe -m hand_tracking extract
-.\.venv\Scripts\python.exe -m hand_tracking train
-.\.venv\Scripts\python.exe -m hand_tracking evaluate
-.\.venv\Scripts\python.exe -m hand_tracking run
+Các ô đọc PDF hoặc source tham khảo cần có thư mục `reference/` cục bộ; clone từ GitHub không kèm thư mục đó.
+
+<a id="cau-truc"></a>
+## Cấu trúc dự án
+
+```text
+Hand-Tracking/
+├── configs/default.json       # Camera, đặc trưng, LSTM và ngưỡng điều khiển
+├── src/hand_tracking/
+│   ├── cli.py                 # Các lệnh ứng dụng
+│   ├── camera.py              # Frame và timestamp
+│   ├── landmarks.py           # MediaPipe Hand Landmarker
+│   ├── features.py            # 44 đặc trưng và SequenceBuffer
+│   ├── collection.py          # Thu clip có nhãn
+│   ├── dataset.py             # Lưu/đọc video, NPZ và manifest
+│   ├── dataset_cleanup.py     # Bỏ mẫu vào backup, khôi phục
+│   ├── model.py               # GestureLSTM, tải checkpoint, dự đoán
+│   ├── training.py            # Huấn luyện theo validation loss
+│   ├── evaluation.py          # Metric và confusion matrix
+│   ├── control.py             # GestureGate và thao tác máy tính
+│   └── app.py                 # Vòng lặp preview / nhận diện
+├── notebook/                  # Nghiên cứu, thực nghiệm, lời trình bày
+├── tests/                     # Kiểm thử tự động
+├── docs/media/                # Asset dùng trong README
+├── assets/hand_landmarker/    # Hướng dẫn tải model landmark
+├── data/                      # README, .gitkeep; dữ liệu thật lưu cục bộ
+├── models/                    # README; checkpoint lưu cục bộ
+├── outputs/                   # README; kết quả sinh ra lưu cục bộ
+├── pyproject.toml             # Package và nhóm phụ thuộc
+├── requirements-vision.lock.txt
+└── run.bat                    # Menu và lệnh nhanh trên Windows
 ```
 
-Các lệnh `check`, `preview`, `collect`, `dataset-check`, `dataset-remove`, `dataset-restore`, `train`, `evaluate` và `run` đã có chức năng. Riêng `extract` còn là lệnh giữ chỗ và trả exit code 2; collect đã lưu sẵn đặc trưng cho dữ liệu mới thu.
+### Những gì được giữ ở máy
 
-## Quy ước cốt lõi
+[.gitignore](.gitignore) loại `.venv`, secrets/cấu hình riêng, cache, log, file build, dữ liệu thu, checkpoint và kết quả sinh tự động. Hai thư mục **`reference/` và `reports/`** cũng được giữ cục bộ. Các hình trong `docs/media/` là asset riêng phục vụ README; không chứa video webcam gốc, khuôn mặt hoặc manifest dữ liệu.
 
-- Nhãn: BACKGROUND = 0, SWIPE_LEFT = 1, SWIPE_RIGHT = 2, SWIPE_UP = 3, SWIPE_DOWN = 4.
-- Chuỗi mặc định: 30 bước × 44 đặc trưng ở 20 Hz, xấp xỉ 1,5 giây.
-- Giữ hai giá trị cổ tay toàn cục ngoài 42 tọa độ cục bộ để bảo toàn hướng chuyển động.
-- Một LSTM, một tầng, 64 chiều trạng thái ẩn, năm đầu ra. Checkpoint tạo bởi lệnh train và không đưa vào Git.
-- Điều khiển khởi động ở trạng thái tắt. F8 bật/tạm dừng và xóa chuỗi đang chờ; F9 thoát toàn cục khi chạy nhận diện có cửa sổ.
-- Dữ liệu ba phiên riêng: train/validation/test. Chi tiết ở data/README.md.
-- Dữ liệu thu gốc, đặc trưng, trọng số, log, .venv cùng toàn bộ hai thư mục reference và reports không đưa vào Git.
+Mã nguồn, cấu hình mặc định, hướng dẫn, notebook và `.gitkeep` được theo dõi để project có thể thiết lập lại trên máy khác.
 
-## Kiểm tra
+<a id="kiem-thu"></a>
+## ✅ Kiểm thử
 
-Cần cài nhóm vision để chạy bộ test cho camera/đặc trưng. Test tự động dùng I/O giả ở biên camera/tracker, không tự bật webcam hoặc cần tải ảnh từ mạng.
+```powershell
+.\run.bat test
+```
+
+Hoặc:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -m compileall -q src
 ```
 
-Đã kiểm tra ngày 30/10/2026: **26 test pass**, model thật chạy được trên ảnh trống và ảnh mẫu một/hai tay; webcam thật đọc 30 frame ở headless và 15 frame có cửa sổ. Lượt camera không có tay trong khung; chưa kiểm chứng cử chỉ động hoặc đo chất lượng trên tay người dùng. Chi tiết tại [ghi nhận kiểm tra](docs/VERIFICATION-2026-10-30.md).
+![Tóm tắt kết quả thật: 60 test đạt, ngày 16/11/2026](docs/media/test-results.png)
 
-Ngày 31/10/2026: chức năng thu/đọc/bỏ/khôi phục dữ liệu có **55 test pass** trên toàn dự án; thao tác ghi, chuyển và khôi phục được kiểm tra bằng video/NPZ thật trong thư mục tạm. Dữ liệu thu thật không bị thay đổi trong lần thêm lệnh xử lý mẫu sai.
+**60/60 kiểm thử đạt** trong lượt chạy cục bộ ngày 16/11/2026. Ảnh trên định dạng lại phần tóm tắt stdout/stderr thật để dễ đọc. Badge test là snapshot của lượt kiểm tra này, không phải trạng thái CI.
 
-Ngày 16/11/2026: chạy lại toàn bộ **60 test, đều đạt**. Kiểm tra thêm luồng ổn định/cooldown/nền của GestureGate và xác nhận test điều hướng phát hiện lỗi khi đảo phím trong bộ nhớ; source không bị thay đổi bởi phép kiểm tra này. Lượt kiểm tra không mở webcam hoặc gửi thao tác desktop.
+Các kiểm thử bao phủ cấu hình/CLI, camera và tracker qua I/O giả, trích đặc trưng, sampling, thu/đọc/bỏ/khôi phục dữ liệu, đánh giá và phím điều hướng. Chúng không tự mở webcam hoặc gửi lệnh thật lên desktop.
+
+<a id="xu-ly-su-co"></a>
+## Khi cần kiểm tra lỗi
+
+<details>
+<summary><strong>No module named hand_tracking</strong></summary>
+
+Đứng tại thư mục gốc project, dùng đúng Python của `.venv` và cài lại package:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[app]"
+.\run.bat check
+```
+
+`run.bat` cũng thêm thư mục `src` vào `PYTHONPATH` cho lượt chạy. Nếu chuyển project sang máy khác, tạo lại môi trường Python.
+
+</details>
+
+<details>
+<summary><strong>Không tìm thấy model hoặc checkpoint không khớp</strong></summary>
+
+- Model landmark phải nằm ở `assets/hand_landmarker/hand_landmarker.task`, hoặc đường dẫn được đặt trong cấu hình.
+- Nhận diện cần checkpoint LSTM tại `models/gesture_lstm.pt`. Chạy huấn luyện khi đã có đủ train/validation, hoặc cung cấp checkpoint tương thích.
+- Loader kiểm tra kiến trúc, thứ tự nhãn, phiên bản đặc trưng, độ dài chuỗi, nhịp lấy mẫu và chiều gương. Dùng cùng cấu hình với dữ liệu và checkpoint.
+
+</details>
+
+<details>
+<summary><strong>Không mở được camera hoặc bộ đệm liên tục bị xóa</strong></summary>
+
+Đóng ứng dụng đang dùng webcam, kiểm tra quyền camera của Windows và thử `--camera-index 1`. Giữ một tay rõ trong khung hình. Mất tay, có hai tay hoặc khoảng hở tracking dài sẽ làm bộ đệm khởi tạo lại.
+
+</details>
+
+<details>
+<summary><strong>Notebook báo Gesture hoặc config chưa được định nghĩa</strong></summary>
+
+Chọn đúng kernel và chạy ô chuẩn bị môi trường/import trước. Sau khi restart kernel, chạy lại các ô từ trên xuống. Nếu đang đứng trong thư mục `notebook`, lệnh mở JupyterLab là:
+
+```powershell
+..\.venv\Scripts\python.exe -m jupyterlab .
+```
+
+</details>
+
+---
+
+<p align="center">
+  <strong>Đọc bài báo · Hiểu code · Chạy thực nghiệm · Đo kết quả</strong><br>
+  <a href="docs/COLLECTION.md">Hướng dẫn thu dữ liệu</a> ·
+  <a href="docs/media/README.md">Nguồn hình ảnh</a> ·
+  <a href="notebook/hand_tracking.ipynb">Notebook</a>
+</p>
