@@ -1,38 +1,145 @@
+# Python environments and installed dependencies.
 .venv/
+venv/
+env/
+ENV/
+node_modules/
+
+# Python bytecode, packaging and build output.
 __pycache__/
-.ipynb_checkpoints/
 *.py[cod]
+*$py.class
+.eggs/
 *.egg-info/
-.pytest_cache/
-.coverage
-htmlcov/
+*.egg
+*.whl
+pip-wheel-metadata/
 build/
 dist/
+
+# Tool caches, test output and coverage.
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.benchmarks/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Jupyter state and connection files (may contain authentication keys).
+.ipynb_checkpoints/
+.jupyter/
+.ipython/
+jpserver-*.json
+nbserver-*.json
+kernel-*.json
+jupyter_cookie_secret
+
+# Local environment files. Only sanitized templates should be committed.
 .env
 .env.*
+*.env
+*.env.*
+.envrc
 !.env.example
+!.env.sample
+!.env.template
+!*.env.example
+!*.env.sample
+!*.env.template
 
-# Local recordings, features, weights and generated reports.
-data/raw/**
-!data/raw/**/
-!data/raw/**/.gitkeep
-data/processed/**
-!data/processed/**/
-!data/processed/**/.gitkeep
-data/manifest.csv
-data/.manifest_*.tmp
-data/sessions/
-data/removed/
-models/**
-!models/README.md
-!models/.gitkeep
-assets/hand_landmarker/*.task
-outputs/**
-!outputs/README.md
-!outputs/.gitkeep
+# Credentials, service accounts, private keys and local credential stores.
+secrets/
+credentials/
+secrets.json
+secrets.toml
+secrets.yaml
+secrets.yml
+credentials.json
+credentials.toml
+credentials.yaml
+credentials.yml
+*credentials*.json
+service-account*.json
+service_account*.json
+*-service-account.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+.pypirc
+.npmrc
+.netrc
+.git-credentials
+/.aws/
+/.azure/
+/.ssh/
+/.config/gcloud/
 
-# Local dependencies.
-node_modules/
+# Machine-specific application configuration.
+configs/local.*
+configs/*.local.*
+
+# Logs, crash dumps, editor backups and temporary files.
+logs/
+*.log
+*.log.*
+*.pid
+*.pid.lock
+*.stackdump
+*.dmp
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+
+# Local editor and operating-system state.
+.vscode/
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local recordings, extracted features, manifests and session metadata.
+# Keep dataset instructions and empty-directory placeholders in Git.
+/data/**
+!/data/**/
+!/data/README.md
+!/data/**/.gitkeep
+
+# Trained weights, downloaded landmark model and generated evaluation output.
+/models/**
+!/models/README.md
+!/models/.gitkeep
+/assets/hand_landmarker/*.task
+/outputs/**
+!/outputs/README.md
+!/outputs/.gitkeep
+
+# Generated machine-learning experiment logs.
+/runs/
+/wandb/
+/mlruns/
+/lightning_logs/
+/tensorboard/
+events.out.tfevents.*
 
 # Research references, progress reports and their submodule metadata stay local.
 /reference/
